@@ -1,5 +1,5 @@
 {
-  "name": "resavia",
+  "name": "ResaSkyHawk",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -15,10 +15,17 @@
     "@angular/common": "~10.1.6",
     "@angular/compiler": "~10.1.6",
     "@angular/core": "~10.1.6",
+    "@angular/fire": "^6.0.3",
     "@angular/forms": "~10.1.6",
+    "@angular/localize": "~10.1.6",
     "@angular/platform-browser": "~10.1.6",
     "@angular/platform-browser-dynamic": "~10.1.6",
     "@angular/router": "~10.1.6",
+    "@ng-bootstrap/ng-bootstrap": "^7.0.0",
+    "angular-calendar": "^0.28.20",
+    "bootstrap": "^4.5.0",
+    "date-fns": "^2.16.1",
+    "firebase": "^7.24.0",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.2"

@@ -1,0 +1,43 @@
+<div class="submit-form" style="margin-top: 50px">
+  <div *ngIf="!submitted">
+    <div class="form-group">
+      <label for="nom">Nom</label>
+      <input type="text"
+             class="form-control"
+             id="nom"
+             required
+             [(ngModel)]="user.nom"
+             name="nom" />
+    </div>
+    <div class="form-group">
+      <label for="prenom">Prénom</label>
+      <input class="form-control"
+             id="prenom"
+             required
+             [(ngModel)]="user.prenom"
+             name="prenom" />
+    </div>
+
+    <button (click)="saveUser()" class="btn btn-success">Submit</button>
+  </div>
+
+  <div *ngIf="submitted">
+    <h4>You submitted successfully!</h4>
+    <button class="btn btn-success" (click)="newUser()">Add</button>
+  </div>
+
+  <div class="list row">
+    <div class="col-md-6">
+      <h4>Users List</h4>
+      <ul class="list-group">
+        <li class="list-group-item"
+            *ngFor="let user of listeUsers; let i = index"
+            [class.active]="i == currentIndex"
+            (click)="setActiveUser(user, i)">
+          {{ user.nom }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
