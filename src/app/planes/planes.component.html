@@ -3,20 +3,18 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th style="vertical-align:top">Prénom</th>
           <th style="vertical-align:top">Nom</th>
           <th style="width:180px;min-width:170px">
-            Action<button style="float:right" [disabled]="createMode || editMode" class="btn btn-success btn-sm" (click)="addUser()">Ajouter</button>
+            Action<button style="float:right" [disabled]="createMode || editMode" class="btn btn-success btn-sm" (click)="addPlane()">Ajouter</button>
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of listeUsers">
-          <td>{{user.prenom}}</td>
-          <td><span>{{user.nom}}</span></td>
+        <tr *ngFor="let plane of listePlanes">
+          <td><span>{{plane.nom}}</span></td>
           <td>
-            <button class="btn btn-info btn-sm" (click)="editUser(user)" [disabled]="createMode || editMode">Editer</button>
-            <button class="btn btn-danger btn-sm" (click)="deleteUser(user)" style="float:right" [disabled]="createMode || editMode">Supprimer</button>
+            <button class="btn btn-info btn-sm" (click)="editPlane(plane)" [disabled]="createMode || editMode">Editer</button>
+            <button class="btn btn-danger btn-sm" (click)="deletePlane(plane)" style="float:right" [disabled]="createMode || editMode">Supprimer</button>
           </td>
         </tr>
       </tbody>
@@ -29,24 +27,16 @@
              class="form-control"
              id="nom"
              required
-             [(ngModel)]="currentUser.nom"
+             [(ngModel)]="currentPlane.nom"
              name="nom" />
     </div>
-    <div class="form-group">
-      <label for="prenom">Prénom</label>
-      <input class="form-control"
-             id="prenom"
-             required
-             [(ngModel)]="currentUser.prenom"
-             name="prenom" />
-    </div>
     <button (click)="cancelEdit()" class="btn btn-warning">Annuler</button>
-    <button (click)="saveUser()" class="btn btn-success" style="float:right">Valider</button>
+    <button (click)="savePlane()" class="btn btn-success" style="float:right">Valider</button>
   </div>
 
   <ng-template #confirmeDelete let-close="close">
     <div class="modal-body text-center">
-      <p>Voulez-vous supprimer cet utilisateur?</p>
+      <p>Voulez-vous supprimer cet avion?</p>
       <button type="button" class="btn btn-success" (click)="close('delete')" style="float:left">Oui</button>
       <button type="button" class="btn btn-warning" (click)="close('cancel')" style="float:right">Annuler</button>
     </div>

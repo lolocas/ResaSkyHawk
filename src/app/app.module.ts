@@ -12,11 +12,18 @@ import { UsersComponent } from './users/users.component';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { environment } from '../environments/environment';
+import { PlanesComponent } from './planes/planes.component';
+import { EventsComponent } from './events/events.component';
+
+//import 'flatpickr/dist/flatpickr.css'; => Dans index.html
+import { FlatpickrModule } from 'angularx-flatpickr';
 
 @NgModule({
   declarations: [
     AppComponent,
-    UsersComponent
+    UsersComponent,
+    PlanesComponent,
+    EventsComponent
   ],
   imports: [
     BrowserModule,
@@ -24,6 +31,7 @@ import { environment } from '../environments/environment';
     AppRoutingModule,
     FormsModule,
     CalendarModule.forRoot({ provide: DateAdapter, useFactory: adapterFactory }),
+    FlatpickrModule.forRoot(),
     NgbModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule

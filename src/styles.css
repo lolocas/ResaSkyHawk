@@ -2,7 +2,20 @@ body {
   background-image: url("./assets/background.jpg");
   background-repeat: no-repeat;
   background-attachment: fixed;
- /* background-position: 50% center;
-  background-size: 70% 50%;
-  background-color: azure;*/
+}
+
+.bouton-image{
+  border: 0;
+  padding: 0;
+}
+
+.bouton-image:before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+}
+
+.addButton:before {
+  background-image: url(./assets/add_20px.png);
 }

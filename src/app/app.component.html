@@ -1,3 +1,5 @@
+<button (click)="openAdmin()" class="btn btn-success">Adminstration</button>
+
 <div style="width:50%;position:relative;left:25%;top:10px;background-color:white;border-radius:10px;box-shadow:10px 10px 5px rgba(0,0,0,0.75)">
   <div class="row text-center">
     <div class="col-md-4 btn-group" style="top:10px;left:10px">
@@ -43,7 +45,7 @@
     </div>
   </div>
   <br />
-  <div [ngSwitch]="view">
+  <div *ngIf="events$ | async;let events" [ngSwitch]="view">
     <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month"
                              [viewDate]="viewDate"
                              [events]="events"
@@ -54,7 +56,8 @@
                              [weekendDays]="weekendDays"
                              (dayClicked)="dayClicked($event.day)"
                              (eventClicked)="handleEvent('Clicked', $event.event)"
-                             (eventTimesChanged)="eventTimesChanged($event)">
+                             (eventTimesChanged)="eventTimesChanged($event)"
+                             [cellTemplate]="customCellTemplate">
     </mwl-calendar-month-view>
     <mwl-calendar-week-view *ngSwitchCase="CalendarView.Week"
                             [viewDate]="viewDate"
@@ -76,28 +79,53 @@
     </mwl-calendar-day-view>
   </div>
 </div>
-<app-users></app-users>
 
-<ng-template #modalContent let-close="close">
+<!-- Modal d'évènement -->
+<ng-template #modalEvent let-close="close">
+  <app-events></app-events>
+</ng-template>
+
+<!-- Module Administration -->
+<ng-template #modalAdmin let-close="close">
   <div class="modal-header">
-    <h5 class="modal-title">Event action occurred</h5>
+    <h5 class="modal-title">Administration</h5>
     <button type="button" class="close" (click)="close()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="modal-body">
-    <div>
-      Action:
-      <pre>{{ modalData?.action }}</pre>
-    </div>
-    <div>
-      Event:
-      <pre>{{ modalData?.event | json }}</pre>
+  <div>
+    <ul class="nav nav-pills" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="users-tab" data-toggle="pill" href="#users" role="tab" aria-controls="users" aria-selected="true">Utilisateurs</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" id="planes-tab" data-toggle="pill" href="#planes" role="tab" aria-controls="planes" aria-selected="false">Avions</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade active show" id="users" role="tabpanel" aria-labelledby="users-tab">
+        <app-users></app-users>
+      </div>
+      <div class="tab-pane fade" id="planes" role="tabpanel" aria-labelledby="planes-tab">
+        <app-planes></app-planes>
+      </div>
     </div>
   </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-outline-secondary" (click)="close()">
-      OK
-    </button>
+</ng-template>
+
+<!-- Custom cell calendar -->
+<ng-template #customCellTemplate let-day="day" let-locale="locale">
+  <div class="cal-cell-top">
+    <button type="button" (click)="addEvent()" class="btn bouton-image addButton" style="float:right"></button>
+    <span style="margin-top:0;margin-left:0;vertical-align:top" class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
+    <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
   </div>
+
+  <div class="cal-events ng-star-inserted">
+    <div mwldraggable="" dragactiveclass="cal-drag-active" class="cal-event ng-star-inserted" aria-hidden="true"
+         [ngStyle]="{'background-color':event.color}" *ngFor="let event of day.events"></div>
+  </div>
+
+
+  <!--  <small style="margin: 5px;">There are {{ day.events.length }} events on this day</small>-->
 </ng-template>

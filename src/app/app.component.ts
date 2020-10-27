@@ -10,10 +10,14 @@ import {
   endOfDay,
   subDays,
   addDays,
+  startOfMonth,
   endOfMonth,
+  startOfWeek,
+  endOfWeek,
   isSameDay,
   isSameMonth,
   addHours,
+  format
 } from 'date-fns';
 import { Subject } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -28,7 +32,14 @@ import {
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr'; // to register french
 import { CustomDateFormatter } from './custom-date-formatter.provider';
-
+import { Event } from './model';
+import { EventsComponent } from './events/events.component';
+import './UtilsHelper';
+import { EventService } from './events/events.service';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { firestore } from 'firebase/app';
+import Timestamp = firestore.Timestamp;
 
 registerLocaleData(localeFr);
 
@@ -47,6 +58,16 @@ const colors: any = {
   },
 };
 
+
+interface Film {
+  id: number;
+  title: string;
+  release_date: string;
+}
+
+
+
+
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,14 +83,36 @@ const colors: any = {
 
 export class AppComponent implements OnInit {
 
-  constructor(private modal: NgbModal) { }
+  constructor(private modal: NgbModal, private eventService: EventService) { }
+
+  //events: CalendarEvent[] = [];
+  //events$: Observable<CalendarEvent<{ event: Film }>[]>;
+
+  events$: Observable<CalendarEvent<{ event: Event }>[]>;
 
   public ngOnInit() {
 
+    this.eventService.getEvents();
+
+
+    this.events$ = this.eventService.items$
+      .pipe(
+        map(actions => {
+          return actions.map((event: Event) => {
+            return {
+              title: event.nom,
+              start: new Date(event.startDateTime.seconds * 1000),
+              color: colors.yellow,
+              allDay: true,
+            };
+          });
+        })
+      );
   }
 
 
-  @ViewChild('modalContent', { static: true }) modalContent: TemplateRef<any>;
+  @ViewChild('modalEvent', { static: true }) modalEvent: TemplateRef<any>;
+  @ViewChild('modalAdmin', { static: true }) modalAdmin: TemplateRef<any>;
 
   view: CalendarView = CalendarView.Month;
 
@@ -82,6 +125,8 @@ export class AppComponent implements OnInit {
   CalendarView = CalendarView;
 
   viewDate: Date = new Date();
+
+  private m_blnAddEvent: boolean = false;
 
   modalData: {
     action: string;
@@ -100,7 +145,7 @@ export class AppComponent implements OnInit {
       label: '<i class="fas fa-fw fa-trash-alt"></i>',
       a11yLabel: 'Delete',
       onClick: ({ event }: { event: CalendarEvent }): void => {
-        this.events = this.events.filter((iEvent) => iEvent !== event);
+////////this.events = this.events.filter((iEvent) => iEvent !== event);
         this.handleEvent('Deleted', event);
       },
     },
@@ -108,51 +153,66 @@ export class AppComponent implements OnInit {
 
   refresh: Subject<any> = new Subject();
 
-  events: CalendarEvent[] = [
-    {
-      start: subDays(startOfDay(new Date()), 1),
-      end: addDays(new Date(), 1),
-      title: 'A 3 day event',
-      color: colors.red,
-      actions: this.actions,
-      allDay: true,
-      resizable: {
-        beforeStart: true,
-        afterEnd: true,
-      },
-      draggable: true,
-    },
-    {
-      start: startOfDay(new Date()),
-      title: 'An event with no end date',
-      color: colors.yellow,
-      actions: this.actions,
-    },
-    {
-      start: subDays(endOfMonth(new Date()), 3),
-      end: addDays(endOfMonth(new Date()), 3),
-      title: 'A long event that spans 2 months',
-      color: colors.blue,
-      allDay: true,
-    },
-    {
-      start: addHours(startOfDay(new Date()), 2),
-      end: addHours(new Date(), 2),
-      title: 'A draggable and resizable event',
-      color: colors.yellow,
-      actions: this.actions,
-      resizable: {
-        beforeStart: true,
-        afterEnd: true,
-      },
-      draggable: true,
-    },
-  ];
+  //events : CalendarEvent[]=
+  //  [
+  //  {
+  //    start: subDays(startOfDay(new Date()), 1),
+  //    end: addDays(new Date(), 1),
+  //    title: 'A 3 day event',
+  //    color: colors.red,
+  //    actions: this.actions,
+  //    allDay: true,
+  //    resizable: {
+  //      beforeStart: true,
+  //      afterEnd: true,
+  //    },
+  //    draggable: true,
+  //  },
+  //  {
+  //    start: startOfDay(new Date()),
+  //    title: 'An event with no end date',
+  //    color: colors.yellow,
+  //    actions: this.actions,
+  //  },
+  //  {
+  //    start: subDays(endOfMonth(new Date()), 3),
+  //    end: addDays(endOfMonth(new Date()), 3),
+  //    title: 'A long event that spans 2 months',
+  //    color: colors.blue,
+  //    allDay: true,
+  //  },
+  //  {
+  //    start: addHours(startOfDay(new Date()), 2),
+  //    end: addHours(new Date(), 2),
+  //    title: 'A draggable and resizable event',
+  //    color: colors.yellow,
+  //    actions: this.actions,
+  //    resizable: {
+  //      beforeStart: true,
+  //      afterEnd: true,
+  //    },
+  //    draggable: true,
+  //  },
+  //];
 
   activeDayIsOpen: boolean = true;
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
-    if (isSameMonth(date, this.viewDate)) {
+    if (this.m_blnAddEvent) {
+      var l_objEvent: Event = new Event();
+      var eventDate: Date = new Date(date);
+      l_objEvent.startDate = eventDate.addHours(12);
+
+      const modalRef = this.modal.open(EventsComponent, { size: 'sm' });
+      modalRef.componentInstance.eventData = { event: l_objEvent, addEvent: true };
+      modalRef.result.then((result) => {
+        if (result) {
+          console.log(result);
+        }
+      });
+
+    }
+    else if (isSameMonth(date, this.viewDate)) {
       if (
         (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) ||
         events.length === 0
@@ -163,6 +223,7 @@ export class AppComponent implements OnInit {
       }
       this.viewDate = date;
     }
+    this.m_blnAddEvent = false;
   }
 
   eventTimesChanged({
@@ -170,7 +231,7 @@ export class AppComponent implements OnInit {
     newStart,
     newEnd,
   }: CalendarEventTimesChangedEvent): void {
-    this.events = this.events.map((iEvent) => {
+    /*this.events = this.events.map((iEvent) => {
       if (iEvent === event) {
         return {
           ...event,
@@ -179,17 +240,17 @@ export class AppComponent implements OnInit {
         };
       }
       return iEvent;
-    });
+    });*/
     this.handleEvent('Dropped or resized', event);
   }
 
   handleEvent(action: string, event: CalendarEvent): void {
     this.modalData = { event, action };
-    this.modal.open(this.modalContent, { size: 'lg' });
+    this.modal.open(this.modalEvent, { size: 'lg' });
   }
 
   deleteEvent(eventToDelete: CalendarEvent) {
-    this.events = this.events.filter((event) => event !== eventToDelete);
+  /////////  this.events = this.events.filter((event) => event !== eventToDelete);
   }
 
   setView(view: CalendarView) {
@@ -198,5 +259,13 @@ export class AppComponent implements OnInit {
 
   closeOpenMonthViewDay() {
     this.activeDayIsOpen = false;
+  }
+
+  public openAdmin() {
+    this.modal.open(this.modalAdmin, { size: 'xl' });
+  }
+
+  public addEvent() {
+    this.m_blnAddEvent = true;
   }
 }
