@@ -1,8 +1,15 @@
-interface Date {
-  addHours: (hours:number) => Date;
+import { firestore } from 'firebase/app';
+import Timestamp = firestore.Timestamp;
+import * as firebase from 'firebase';
+
+export class UtilsHelper {
+  static TimestampToDate(timestamp: Timestamp): Date {
+    return new Date(timestamp.seconds * 1000);
+  }
+
+  static DateToTimestamp(value: Date): Timestamp {
+    return firebase.firestore.Timestamp.fromDate(value);
+  }
 }
 
-Date.prototype.addHours = function (hours:number) {
-  this.setTime(this.getTime() + (hours * 60 * 60 * 1000));
-  return this;
-}
+

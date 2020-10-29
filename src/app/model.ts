@@ -22,6 +22,7 @@ export class Event {
   public key: string;
   public nom: string;
   public startDateTime: Timestamp;
+  public endDateTime: Timestamp;
 
   private _startDate: Date;
   get startDate(): Date {
@@ -32,12 +33,13 @@ export class Event {
     this.startDateTime = firebase.firestore.Timestamp.fromDate(value);
   }
 
-  //private _startDateTime: Timestamp;
-  //get startDateTime(): Timestamp {
-  //  return this._startDateTime;
-  //}
-  //set startDateTime(value: Timestamp) {
-  //  this._startDateTime = value;
-  //  this.startDate = value.toDate();
-  //}
+  private _endDate: Date;
+  get endDate(): Date {
+    return this._endDate;
+  }
+  set endDate(value: Date) {
+    this._endDate = value;
+    this.endDateTime = firebase.firestore.Timestamp.fromDate(value);
+  }
+
 }

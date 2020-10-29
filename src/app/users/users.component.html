@@ -24,6 +24,14 @@
   </div>
   <div *ngIf="editMode||createMode" class="col-md-6">
     <div class="form-group">
+      <label for="prenom">Prénom</label>
+      <input class="form-control"
+             id="prenom"
+             required
+             [(ngModel)]="currentUser.prenom"
+             name="prenom" />
+    </div>
+    <div class="form-group">
       <label for="nom">Nom</label>
       <input type="text"
              class="form-control"
@@ -32,14 +40,7 @@
              [(ngModel)]="currentUser.nom"
              name="nom" />
     </div>
-    <div class="form-group">
-      <label for="prenom">Prénom</label>
-      <input class="form-control"
-             id="prenom"
-             required
-             [(ngModel)]="currentUser.prenom"
-             name="prenom" />
-    </div>
+
     <button (click)="cancelEdit()" class="btn btn-warning">Annuler</button>
     <button (click)="saveUser()" class="btn btn-success" style="float:right">Valider</button>
   </div>

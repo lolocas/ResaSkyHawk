@@ -32,14 +32,14 @@ import {
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr'; // to register french
 import { CustomDateFormatter } from './custom-date-formatter.provider';
-import { Event } from './model';
+import { Event, Users } from './model';
 import { EventsComponent } from './events/events.component';
-import './UtilsHelper';
+import './iDate';
 import { EventService } from './events/events.service';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { firestore } from 'firebase/app';
-import Timestamp = firestore.Timestamp;
+import { UsersService } from './users/users.service';
+import { UtilsHelper } from './UtilsHelper';
 
 registerLocaleData(localeFr);
 
@@ -58,16 +58,6 @@ const colors: any = {
   },
 };
 
-
-interface Film {
-  id: number;
-  title: string;
-  release_date: string;
-}
-
-
-
-
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -83,36 +73,53 @@ interface Film {
 
 export class AppComponent implements OnInit {
 
-  constructor(private modal: NgbModal, private eventService: EventService) { }
+  constructor(private modal: NgbModal, private eventService: EventService, private usersService : UsersService) { }
 
-  //events: CalendarEvent[] = [];
-  //events$: Observable<CalendarEvent<{ event: Film }>[]>;
-
-  events$: Observable<CalendarEvent<{ event: Event }>[]>;
+  public events$: Observable<CalendarEvent<{ event: Event }>[]>;
+  private listeUsers: any;
+  private listeEvents: Array<Event> = [];
 
   public ngOnInit() {
 
     this.eventService.getEvents();
-
-
     this.events$ = this.eventService.items$
       .pipe(
-        map(actions => {
-          return actions.map((event: Event) => {
+        map(events => {
+          return events.map(eventP => {
+            const data = eventP.payload.val();
+            const key = eventP.key;
+            var event = { key, ...data };
+            this.listeEvents.push(event);
             return {
-              title: event.nom,
+              event : event,
+              id: event.key,
+              title: event.nom + ' de ' + UtilsHelper.TimestampToDate(event.startDateTime).getHours() + 'h à ' + UtilsHelper.TimestampToDate(event.endDateTime).getHours() + 'h',
               start: new Date(event.startDateTime.seconds * 1000),
+              end: new Date(event.endDateTime.seconds * 1000),
+              actions: this.actions,
               color: colors.yellow,
               allDay: true,
             };
           });
         })
-      );
+    );
+
+    this.usersService.getAll().snapshotChanges().pipe(
+      map(changes =>
+        changes.map(c =>
+          ({ key: c.payload.key, ...c.payload.val() })
+        )
+      )
+    ).subscribe(data => {
+      this.listeUsers = data;
+    });
   }
 
 
   @ViewChild('modalEvent', { static: true }) modalEvent: TemplateRef<any>;
   @ViewChild('modalAdmin', { static: true }) modalAdmin: TemplateRef<any>;
+  @ViewChild('confirmeDelete', { static: true }) confirmeDelete: TemplateRef<any>;
+
 
   view: CalendarView = CalendarView.Month;
 
@@ -135,18 +142,18 @@ export class AppComponent implements OnInit {
 
   actions: CalendarEventAction[] = [
     {
-      label: '<i class="fas fa-fw fa-pencil-alt"></i>',
+      label: '<img src="../assets/edit.png"></img>',
       a11yLabel: 'Edit',
       onClick: ({ event }: { event: CalendarEvent }): void => {
-        this.handleEvent('Edited', event);
+        this.editEvent(event);
       },
     },
     {
-      label: '<i class="fas fa-fw fa-trash-alt"></i>',
+      label: '<img src="../assets/delete.png"></img>',
       a11yLabel: 'Delete',
       onClick: ({ event }: { event: CalendarEvent }): void => {
 ////////this.events = this.events.filter((iEvent) => iEvent !== event);
-        this.handleEvent('Deleted', event);
+        this.deleteEvent(event);
       },
     },
   ];
@@ -200,8 +207,11 @@ export class AppComponent implements OnInit {
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (this.m_blnAddEvent) {
       var l_objEvent: Event = new Event();
-      var eventDate: Date = new Date(date);
-      l_objEvent.startDate = eventDate.addHours(12);
+      l_objEvent.startDate = new Date(date).addHours(12);
+      l_objEvent.endDate = new Date(date).addHours(13);
+
+      var l_intUser = Math.floor(Math.random() * this.listeUsers.length);
+      l_objEvent.nom = this.listeUsers[l_intUser].nom;
 
       const modalRef = this.modal.open(EventsComponent, { size: 'sm' });
       modalRef.componentInstance.eventData = { event: l_objEvent, addEvent: true };
@@ -210,7 +220,8 @@ export class AppComponent implements OnInit {
           console.log(result);
         }
       });
-
+      this.activeDayIsOpen = true;
+      this.viewDate = date;
     }
     else if (isSameMonth(date, this.viewDate)) {
       if (
@@ -249,9 +260,9 @@ export class AppComponent implements OnInit {
     this.modal.open(this.modalEvent, { size: 'lg' });
   }
 
-  deleteEvent(eventToDelete: CalendarEvent) {
-  /////////  this.events = this.events.filter((event) => event !== eventToDelete);
-  }
+  //deleteEvent(eventToDelete: CalendarEvent) {
+  ///////////  this.events = this.events.filter((event) => event !== eventToDelete);
+  //}
 
   setView(view: CalendarView) {
     this.view = view;
@@ -267,5 +278,27 @@ export class AppComponent implements OnInit {
 
   public addEvent() {
     this.m_blnAddEvent = true;
+  }
+
+  private editEvent(eventC: CalendarEvent) {
+    var l_objEvent = this.listeEvents.find(item => item.key = eventC.id as string);
+    l_objEvent.startDate = UtilsHelper.TimestampToDate(l_objEvent.startDateTime);
+    l_objEvent.endDate = UtilsHelper.TimestampToDate(l_objEvent.endDateTime);
+
+    const modalRef = this.modal.open(EventsComponent, { size: 'sm' });
+    modalRef.componentInstance.eventData = { event: l_objEvent, addEvent: false };
+    modalRef.result.then((result) => {
+      if (result) {
+        console.log(result);
+      }
+    });
+  }
+
+  private deleteEvent(eventC: CalendarEvent) {
+    this.modal.open(this.confirmeDelete, { size: 'sm' }).result.then((result) => {
+      if (result == 'delete') {
+        this.eventService.delete(eventC.id as string);
+      }
+    });
   }
 }

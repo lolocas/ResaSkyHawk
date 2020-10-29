@@ -7,20 +7,38 @@
   </div>
 
   <div class="modal-body">
-    <input class="form-control"
-           type="text"
-           mwlFlatpickr
-           [(ngModel)]="eventData.event.startDate"
-           (ngModelChange)="refresh.next()"
-           [altInput]="true"
-           [convertModelValue]="true"
-           [enableTime]="true"
-           dateFormat="d-m-YTH:i"
-           altFormat="j F Y H:i"
-           [time24hr]="true"
-           placeholder="Not set" />
+    <div class="row">
+      <label class="col-md-3" for="debut">Début</label>
+      <input class="form-control col-md-9"
+             type="text"
+             mwlFlatpickr
+             [(ngModel)]="eventData.event.startDate"
+             (ngModelChange)="refresh.next()"
+             [altInput]="true"
+             [convertModelValue]="true"
+             [enableTime]="true"
+             dateFormat="d-m-YTH:i"
+             altFormat="j F Y H:i"
+             [time24hr]="true"
+             placeholder="Not set" />
+    </div>
+    <div class="row">
+      <label class="col-md-3" for="fin">Fin</label>
+      <input class="form-control col-md-9"
+             type="text"
+             mwlFlatpickr
+             [(ngModel)]="eventData.event.endDate"
+             (ngModelChange)="refresh.next()"
+             [altInput]="true"
+             [convertModelValue]="true"
+             [enableTime]="true"
+             dateFormat="d-m-YTH:i"
+             altFormat="j F Y H:i"
+             [time24hr]="true"
+             placeholder="Not set" />
+    </div>
   </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-success" (click)="valider()">Valider</button>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-success" (click)="valider()">Valider</button>
+    </div>
   </div>
-</div>

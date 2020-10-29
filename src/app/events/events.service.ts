@@ -2,9 +2,6 @@ import { Injectable } from '@angular/core';
 import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
 import { Event } from '../model';
 
-
-
-import { firestore } from 'firebase/app';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -42,7 +39,7 @@ export class EventService {
   }
 
   getEvents(): any {
-    this.items$ = this.db.list(this.dbPath).valueChanges();
+    this.items$ = this.db.list(this.dbPath).snapshotChanges();
   }
 
 }

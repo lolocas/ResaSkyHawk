@@ -3,6 +3,7 @@ import { EventService } from './events.service';
 import { Event } from '../model';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
+import { UtilsHelper } from '../UtilsHelper';
 
 @Component({
   selector: 'app-events',
@@ -22,7 +23,7 @@ export class EventsComponent implements OnInit {
   }
 
   public valider(): void {
-    this.eventData.event.nom = 'TTI';
+    //this.eventData.event.nom = 'TTI';
     this.saveEvent();
     this.modal.close(this.saveEvent);
   }
@@ -34,6 +35,9 @@ export class EventsComponent implements OnInit {
       });
     }
     else {
+      this.eventData.event.startDateTime = UtilsHelper.DateToTimestamp(this.eventData.event.startDate);
+      this.eventData.event.endDateTime = UtilsHelper.DateToTimestamp(this.eventData.event.endDate);
+
       this.eventService.update(this.eventData.event.key, this.eventData.event).then(() => {
         console.log('Edit event successfully!', this.eventData.event);
       });

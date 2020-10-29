@@ -129,3 +129,11 @@
 
   <!--  <small style="margin: 5px;">There are {{ day.events.length }} events on this day</small>-->
 </ng-template>
+
+<ng-template #confirmeDelete let-close="close">
+  <div class="modal-body text-center">
+    <p>Voulez-vous supprimer cet événement ?</p>
+    <button type="button" class="btn btn-success" (click)="close('delete')" style="float:left">Oui</button>
+    <button type="button" class="btn btn-warning" (click)="close('cancel')" style="float:right">Annuler</button>
+  </div>
+</ng-template>
