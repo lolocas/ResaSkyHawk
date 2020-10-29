@@ -17,6 +17,8 @@ import { EventsComponent } from './events/events.component';
 
 //import 'flatpickr/dist/flatpickr.css'; => Dans index.html
 import { FlatpickrModule } from 'angularx-flatpickr';
+import flatpickr from 'flatpickr';
+import { French } from 'flatpickr/dist/l10n/fr';
 
 @NgModule({
   declarations: [
@@ -40,3 +42,8 @@ import { FlatpickrModule } from 'angularx-flatpickr';
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+export function flatpickrFactory() {
+  flatpickr.localize(French);
+  return flatpickr;
+}

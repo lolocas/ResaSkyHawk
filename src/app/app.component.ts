@@ -34,7 +34,6 @@ import localeFr from '@angular/common/locales/fr'; // to register french
 import { CustomDateFormatter } from './custom-date-formatter.provider';
 import { Event, Users } from './model';
 import { EventsComponent } from './events/events.component';
-import './iDate';
 import { EventService } from './events/events.service';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -96,9 +95,8 @@ export class AppComponent implements OnInit {
               title: event.nom + ' de ' + UtilsHelper.TimestampToDate(event.startDateTime).getHours() + 'h à ' + UtilsHelper.TimestampToDate(event.endDateTime).getHours() + 'h',
               start: new Date(event.startDateTime.seconds * 1000),
               end: new Date(event.endDateTime.seconds * 1000),
+              color: colors.blue,
               actions: this.actions,
-              color: colors.yellow,
-              allDay: true,
             };
           });
         })
@@ -207,8 +205,8 @@ export class AppComponent implements OnInit {
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (this.m_blnAddEvent) {
       var l_objEvent: Event = new Event();
-      l_objEvent.startDate = new Date(date).addHours(12);
-      l_objEvent.endDate = new Date(date).addHours(13);
+      l_objEvent.startDate = addHours(date, 12);
+      l_objEvent.endDate = addHours(date, 13);
 
       var l_intUser = Math.floor(Math.random() * this.listeUsers.length);
       l_objEvent.nom = this.listeUsers[l_intUser].nom;

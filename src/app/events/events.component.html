@@ -9,28 +9,31 @@
   <div class="modal-body">
     <div class="row">
       <label class="col-md-3" for="debut">Début</label>
-      <input class="form-control col-md-9"
+      <input class="form-control col-md-8"
              type="text"
              mwlFlatpickr
              [(ngModel)]="eventData.event.startDate"
              (ngModelChange)="refresh.next()"
              [altInput]="true"
              [convertModelValue]="true"
+             [noCalendar]="true"
              [enableTime]="true"
              dateFormat="d-m-YTH:i"
              altFormat="j F Y H:i"
              [time24hr]="true"
+             [locale]="'French'"
              placeholder="Not set" />
     </div>
     <div class="row">
       <label class="col-md-3" for="fin">Fin</label>
-      <input class="form-control col-md-9"
+      <input class="form-control col-md-8"
              type="text"
              mwlFlatpickr
              [(ngModel)]="eventData.event.endDate"
              (ngModelChange)="refresh.next()"
              [altInput]="true"
              [convertModelValue]="true"
+             [noCalendar]="true"
              [enableTime]="true"
              dateFormat="d-m-YTH:i"
              altFormat="j F Y H:i"

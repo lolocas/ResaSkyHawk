@@ -4,6 +4,7 @@ import { Event } from '../model';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { UtilsHelper } from '../UtilsHelper';
+import { flatpickrFactory } from '../app.module';
 
 @Component({
   selector: 'app-events',
@@ -20,6 +21,7 @@ export class EventsComponent implements OnInit {
   constructor(private eventService: EventService, public modal: NgbActiveModal) { }
 
   ngOnInit(): void {
+    flatpickrFactory();
   }
 
   public valider(): void {
