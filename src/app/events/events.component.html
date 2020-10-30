@@ -1,44 +1,39 @@
 <div>
   <div class="modal-header">
-    <h5 class="modal-title">Ajout d'évènement</h5>
+    <h6 class="modal-title">Réservation du {{dateDay | date: 'dd/MM/yyyy'}}</h6>
     <button type="button" class="close" (click)="modal.close('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
 
   <div class="modal-body">
-    <div class="row">
-      <label class="col-md-3" for="debut">Début</label>
+    <div class="row" *ngIf="!eventData.addEvent">
+      <label class="col-md-3" for="date">Date</label>
       <input class="form-control col-md-8"
              type="text"
              mwlFlatpickr
-             [(ngModel)]="eventData.event.startDate"
+             [(ngModel)]="dateDay"
              (ngModelChange)="refresh.next()"
              [altInput]="true"
              [convertModelValue]="true"
-             [noCalendar]="true"
-             [enableTime]="true"
-             dateFormat="d-m-YTH:i"
-             altFormat="j F Y H:i"
+             [noCalendar]="false"
+             [enableTime]="false"
+             dateFormat="d-m-YT"
+             altFormat="j F Y"
              [time24hr]="true"
              [locale]="'French'"
              placeholder="Not set" />
     </div>
     <div class="row">
+      <label class="col-md-3" for="debut">Début</label>
+      <ngx-timepicker-field class="form-control col-md-7" [format]="24" [(ngModel)]="startTime"
+                            [defaultTime]="'12:00'" (timeChanged)="timeStartChange($event)"></ngx-timepicker-field>
+
+    </div>
+    <div class="row">
       <label class="col-md-3" for="fin">Fin</label>
-      <input class="form-control col-md-8"
-             type="text"
-             mwlFlatpickr
-             [(ngModel)]="eventData.event.endDate"
-             (ngModelChange)="refresh.next()"
-             [altInput]="true"
-             [convertModelValue]="true"
-             [noCalendar]="true"
-             [enableTime]="true"
-             dateFormat="d-m-YTH:i"
-             altFormat="j F Y H:i"
-             [time24hr]="true"
-             placeholder="Not set" />
+      <ngx-timepicker-field class="form-control col-md-7" [format]="24" [(ngModel)]="endTime"
+                            [defaultTime]="'13:00'" (timeChanged)="timeEndChange($event)"></ngx-timepicker-field>
     </div>
   </div>
     <div class="modal-footer">

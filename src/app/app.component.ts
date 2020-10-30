@@ -205,8 +205,8 @@ export class AppComponent implements OnInit {
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (this.m_blnAddEvent) {
       var l_objEvent: Event = new Event();
-      l_objEvent.startDate = addHours(date, 12);
-      l_objEvent.endDate = addHours(date, 13);
+      l_objEvent.startDate = date;
+      l_objEvent.endDate = date;
 
       var l_intUser = Math.floor(Math.random() * this.listeUsers.length);
       l_objEvent.nom = this.listeUsers[l_intUser].nom;
@@ -278,8 +278,8 @@ export class AppComponent implements OnInit {
     this.m_blnAddEvent = true;
   }
 
-  private editEvent(eventC: CalendarEvent) {
-    var l_objEvent = this.listeEvents.find(item => item.key = eventC.id as string);
+  private editEvent(eventC: any) {
+    var l_objEvent = eventC.event;
     l_objEvent.startDate = UtilsHelper.TimestampToDate(l_objEvent.startDateTime);
     l_objEvent.endDate = UtilsHelper.TimestampToDate(l_objEvent.endDateTime);
 

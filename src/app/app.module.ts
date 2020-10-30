@@ -20,6 +20,8 @@ import { FlatpickrModule } from 'angularx-flatpickr';
 import flatpickr from 'flatpickr';
 import { French } from 'flatpickr/dist/l10n/fr';
 
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -36,7 +38,8 @@ import { French } from 'flatpickr/dist/l10n/fr';
     FlatpickrModule.forRoot(),
     NgbModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
+    NgxMaterialTimepickerModule
   ],
   providers: [AppComponent],
   bootstrap: [AppComponent]

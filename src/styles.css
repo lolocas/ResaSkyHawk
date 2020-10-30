@@ -19,3 +19,12 @@ body {
 .addButton:before {
   background-image: url(./assets/add_20px.png);
 }
+
+/* Pour l'horloge du timepicker dans un dialog*/
+.timepicker-overlay {
+  z-index: 10000000 !important;
+}
+
+.timepicker-backdrop-overlay {
+  z-index: 10000000 !important;
+}

@@ -32,6 +32,7 @@
     "flatpickr": "^4.6.6",
     "g": "^2.0.1",
     "jquery": "^3.5.1",
+    "ngx-material-timepicker": "^5.5.3",
     "rxjs": "~6.6.0",
     "save": "^2.4.0",
     "tslib": "^2.0.0",
