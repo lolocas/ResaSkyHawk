@@ -54,13 +54,8 @@ export class UsersComponent implements OnInit {
 
   public deleteUser(user: Users): void {
     this.currentUser = user;
-    this.modal.open(this.confirmeDelete, { size: 'sm' }).result.then((result) => {
-      if (result == 'delete') {
+    if (confirm('Voulez-vous supprimer cet utilisateur ?'))
         this.usersService.delete(this.currentUser.key);
-      }
-    }, (reason) => {
-      var closeResult = `Dismissed $`;
-    });
   }
 
   public cancelEdit() {

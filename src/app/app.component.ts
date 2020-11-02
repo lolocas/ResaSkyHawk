@@ -89,10 +89,12 @@ export class AppComponent implements OnInit {
             const key = eventP.key;
             var event = { key, ...data };
             this.listeEvents.push(event);
+            var startDate = UtilsHelper.TimestampToDate(event.startDateTime);
+            var endDate = UtilsHelper.TimestampToDate(event.endDateTime);
             return {
               event : event,
               id: event.key,
-              title: event.nom + ' de ' + UtilsHelper.TimestampToDate(event.startDateTime).getHours() + 'h à ' + UtilsHelper.TimestampToDate(event.endDateTime).getHours() + 'h',
+              title: event.nom + ' de ' + startDate.getHours() + ':' + String(startDate.getMinutes()).padStart(2, "0") + ' à ' + endDate.getHours() + ':' + String(endDate.getMinutes()).padStart(2, "0"),
               start: new Date(event.startDateTime.seconds * 1000),
               end: new Date(event.endDateTime.seconds * 1000),
               color: colors.blue,
@@ -116,8 +118,6 @@ export class AppComponent implements OnInit {
 
   @ViewChild('modalEvent', { static: true }) modalEvent: TemplateRef<any>;
   @ViewChild('modalAdmin', { static: true }) modalAdmin: TemplateRef<any>;
-  @ViewChild('confirmeDelete', { static: true }) confirmeDelete: TemplateRef<any>;
-
 
   view: CalendarView = CalendarView.Month;
 
@@ -293,10 +293,7 @@ export class AppComponent implements OnInit {
   }
 
   private deleteEvent(eventC: CalendarEvent) {
-    this.modal.open(this.confirmeDelete, { size: 'sm' }).result.then((result) => {
-      if (result == 'delete') {
-        this.eventService.delete(eventC.id as string);
-      }
-    });
+    if (confirm('Voulez-vous supprimer cette réservation ?'))
+      this.eventService.delete(eventC.id as string);
   }
 }

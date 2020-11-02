@@ -17,9 +17,6 @@ export class PlanesComponent implements OnInit {
   public currentPlane: Plane = null;
   public clonePlane: Plane = null;
 
-  @ViewChild('confirmeDelete', { static: true }) confirmeDelete: TemplateRef<any>;
-
-
   constructor(private planeService: PlaneService, private modal: NgbModal) { }
 
   ngOnInit(): void {
@@ -55,13 +52,8 @@ export class PlanesComponent implements OnInit {
 
   public deletePlane(plane: Plane): void {
     this.currentPlane = plane;
-    this.modal.open(this.confirmeDelete, { size: 'sm' }).result.then((result) => {
-      if (result == 'delete') {
+    if (confirm('Voulez-vous supprimer cet avion ?'))
         this.planeService.delete(this.currentPlane.key);
-      }
-    }, (reason) => {
-      var closeResult = `Dismissed $`;
-    });
   }
 
   public cancelEdit() {

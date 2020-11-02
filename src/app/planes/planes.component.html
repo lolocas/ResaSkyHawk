@@ -34,12 +34,3 @@
     <button (click)="savePlane()" class="btn btn-success" style="float:right">Valider</button>
   </div>
 
-  <ng-template #confirmeDelete let-close="close">
-    <div class="modal-body text-center">
-      <p>Voulez-vous supprimer cet avion?</p>
-      <button type="button" class="btn btn-success" (click)="close('delete')" style="float:left">Oui</button>
-      <button type="button" class="btn btn-warning" (click)="close('cancel')" style="float:right">Annuler</button>
-    </div>
-  </ng-template>
-</div>
-

@@ -11,5 +11,3 @@ export class UtilsHelper {
     return firebase.firestore.Timestamp.fromDate(value);
   }
 }
-
-

@@ -18,8 +18,6 @@ export class EventsComponent implements OnInit {
   @Input() @Output() public endTime: string = '13:00';
   @Input() @Output() public dateDay: Date;
 
-  @ViewChild('confirmeDelete', { static: true }) confirmeDelete: TemplateRef<any>;
-
   constructor(private eventService: EventService, public modal: NgbActiveModal) { }
 
   ngOnInit(): void {
@@ -57,21 +55,19 @@ export class EventsComponent implements OnInit {
   private saveEvent(): void {
     var l_lstStartHours = this.startTime.split(':');
     var l_lstEndHours = this.endTime.split(':');
-    if (!this.eventData.addEvent) {
-      this.eventData.event.startDate = new Date(this.dateDay);
-      this.eventData.event.endDate = new Date(this.dateDay);
-    }
+    this.eventData.event.startDate = new Date(this.dateDay);
+    this.eventData.event.endDate = new Date(this.dateDay);
     this.eventData.event.startDate.setHours(Number(l_lstStartHours[0]), Number(l_lstStartHours[1]));
     this.eventData.event.endDate.setHours(Number(l_lstEndHours[0]), Number(l_lstEndHours[1]));
+    this.eventData.event.startDateTime = UtilsHelper.DateToTimestamp(this.eventData.event.startDate);
+    this.eventData.event.endDateTime = UtilsHelper.DateToTimestamp(this.eventData.event.endDate);
+
     if (this.eventData.addEvent) {
       this.eventService.create(this.eventData.event).then(() => {
         console.log('Created new event successfully!', this.eventData.event);
       });
     }
     else {
-      this.eventData.event.startDateTime = UtilsHelper.DateToTimestamp(this.eventData.event.startDate);
-      this.eventData.event.endDateTime = UtilsHelper.DateToTimestamp(this.eventData.event.endDate);
-
       this.eventService.update(this.eventData.event.key, this.eventData.event).then(() => {
         console.log('Edit event successfully!', this.eventData.event);
       });
