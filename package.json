@@ -13,6 +13,7 @@
   "dependencies": {
     "-": "0.0.1",
     "@angular/animations": "~10.1.6",
+    "@angular/cdk": "^10.2.7",
     "@angular/common": "~10.1.6",
     "@angular/compiler": "~10.1.6",
     "@angular/core": "~10.1.6",
@@ -32,6 +33,7 @@
     "flatpickr": "^4.6.6",
     "g": "^2.0.1",
     "jquery": "^3.5.1",
+    "ngx-contextmenu": "^5.4.0",
     "ngx-material-timepicker": "^5.5.3",
     "rxjs": "~6.6.0",
     "save": "^2.4.0",

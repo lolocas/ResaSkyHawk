@@ -4,6 +4,7 @@ import {
   ViewChild,
   TemplateRef,
   OnInit,
+  APP_BOOTSTRAP_LISTENER,
 } from '@angular/core';
 import {
   startOfDay,
@@ -204,22 +205,7 @@ export class AppComponent implements OnInit {
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (this.m_blnAddEvent) {
-      var l_objEvent: Event = new Event();
-      l_objEvent.startDate = date;
-      l_objEvent.endDate = date;
-
-      var l_intUser = Math.floor(Math.random() * this.listeUsers.length);
-      l_objEvent.nom = this.listeUsers[l_intUser].nom;
-
-      const modalRef = this.modal.open(EventsComponent, { size: 'sm' });
-      modalRef.componentInstance.eventData = { event: l_objEvent, addEvent: true };
-      modalRef.result.then((result) => {
-        if (result) {
-          console.log(result);
-        }
-      });
-      this.activeDayIsOpen = true;
-      this.viewDate = date;
+      this.openEvent(date);
     }
     else if (isSameMonth(date, this.viewDate)) {
       if (
@@ -276,6 +262,33 @@ export class AppComponent implements OnInit {
 
   public addEvent() {
     this.m_blnAddEvent = true;
+  }
+
+  public openEvent(date?: Date, isWithHours?:boolean) {
+    var isShowDate: Boolean = false;
+    if (!date) {
+      date = new Date();
+      isShowDate = true;
+    }
+    var l_objEvent: Event = new Event();
+    l_objEvent.startDate = date;
+    l_objEvent.endDate = date;
+
+    if (isWithHours)
+      l_objEvent.endDate = addHours(l_objEvent.endDate, 1);
+
+    var l_intUser = Math.floor(Math.random() * this.listeUsers.length);
+    l_objEvent.nom = this.listeUsers[l_intUser].nom;
+
+    const modalRef = this.modal.open(EventsComponent, { size: 'sm' });
+    modalRef.componentInstance.eventData = { event: l_objEvent, addEvent: true, showDate: isShowDate, withHours: isWithHours };
+    modalRef.result.then((result) => {
+      if (result) {
+        console.log(result);
+      }
+    });
+    this.activeDayIsOpen = true;
+    this.viewDate = date;
   }
 
   private editEvent(eventC: any) {

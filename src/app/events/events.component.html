@@ -7,7 +7,7 @@
   </div>
 
   <div class="modal-body">
-    <div class="row" *ngIf="!eventData.addEvent">
+    <div class="row" *ngIf="!eventData.addEvent || eventData.showDate">
       <label class="col-md-3" for="date">Date</label>
       <input class="form-control col-md-8"
              type="text"

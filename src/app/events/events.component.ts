@@ -12,7 +12,7 @@ import { flatpickrFactory } from '../app.module';
   styleUrls: ['./events.component.css']
 })
 export class EventsComponent implements OnInit {
-  @Input() @Output() public eventData: { event: Event, addEvent: boolean };
+  @Input() @Output() public eventData: { event: Event, addEvent: boolean, showDate: boolean, withHours: boolean };
   public refresh: Subject<any> = new Subject();
   @Input() @Output() public startTime: string = '12:00';
   @Input() @Output() public endTime: string = '13:00';
@@ -25,7 +25,7 @@ export class EventsComponent implements OnInit {
 
       this.dateDay = this.eventData.event.startDate;
 
-    if (!this.eventData.addEvent) {
+    if (!this.eventData.addEvent || this.eventData.withHours) {
       this.startTime = this.eventData.event.startDate.getHours() + ':' + this.eventData.event.startDate.getMinutes();
       this.endTime = this.eventData.event.endDate.getHours() + ':' + this.eventData.event.endDate.getMinutes();
     }

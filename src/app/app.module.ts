@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
+import { ContextMenuModule } from 'ngx-contextmenu';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -35,6 +36,7 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
     AppRoutingModule,
     FormsModule,
     CalendarModule.forRoot({ provide: DateAdapter, useFactory: adapterFactory }),
+    ContextMenuModule.forRoot({ useBootstrap4: true }),
     FlatpickrModule.forRoot(),
     NgbModule,
     AngularFireModule.initializeApp(environment.firebase),
