@@ -23,6 +23,7 @@ export class Event {
   public nom: string;
   public startDateTime: Timestamp;
   public endDateTime: Timestamp;
+  public keyPlane: string;
 
   private _startDate: Date;
   get startDate(): Date {

@@ -33,12 +33,13 @@ import {
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr'; // to register french
 import { CustomDateFormatter } from './custom-date-formatter.provider';
-import { Event, Users } from './model';
+import { Event, Users, Plane } from './model';
 import { EventsComponent } from './events/events.component';
 import { EventService } from './events/events.service';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { UsersService } from './users/users.service';
+import { PlaneService } from './planes/planes.service';
 import { UtilsHelper } from './UtilsHelper';
 
 registerLocaleData(localeFr);
@@ -73,11 +74,13 @@ const colors: any = {
 
 export class AppComponent implements OnInit {
 
-  constructor(private modal: NgbModal, private eventService: EventService, private usersService : UsersService) { }
+  constructor(private modal: NgbModal, private eventService: EventService, private usersService: UsersService, private planeService: PlaneService) { }
 
   public events$: Observable<CalendarEvent<{ event: Event }>[]>;
   private listeUsers: any;
+  private listePlanes: any;
   private listeEvents: Array<Event> = [];
+  public selectedPlane: Plane = new Plane();
 
   public ngOnInit() {
 
@@ -114,6 +117,19 @@ export class AppComponent implements OnInit {
     ).subscribe(data => {
       this.listeUsers = data;
     });
+
+    this.planeService.getAll().snapshotChanges().pipe(
+      map(changes =>
+        changes.map(c =>
+          ({ key: c.payload.key, ...c.payload.val() })
+        )
+      )
+    ).subscribe(data => {
+      this.listePlanes = data;
+      if (this.listePlanes && this.listePlanes.length > 0)
+        this.selectedPlane = this.listePlanes[0];
+    });
+
   }
 
 
@@ -273,6 +289,7 @@ export class AppComponent implements OnInit {
     var l_objEvent: Event = new Event();
     l_objEvent.startDate = date;
     l_objEvent.endDate = date;
+    l_objEvent.keyPlane = this.selectedPlane.key;
 
     if (isWithHours)
       l_objEvent.endDate = addHours(l_objEvent.endDate, 1);
@@ -295,6 +312,7 @@ export class AppComponent implements OnInit {
     var l_objEvent = eventC.event;
     l_objEvent.startDate = UtilsHelper.TimestampToDate(l_objEvent.startDateTime);
     l_objEvent.endDate = UtilsHelper.TimestampToDate(l_objEvent.endDateTime);
+    l_objEvent.keyPlane = this.selectedPlane;
 
     const modalRef = this.modal.open(EventsComponent, { size: 'sm' });
     modalRef.componentInstance.eventData = { event: l_objEvent, addEvent: false };
@@ -309,4 +327,9 @@ export class AppComponent implements OnInit {
     if (confirm('Voulez-vous supprimer cette réservation ?'))
       this.eventService.delete(eventC.id as string);
   }
+
+  public selectPlane(plane: Plane) {
+    this.selectedPlane = plane;
+  }
+
 }
