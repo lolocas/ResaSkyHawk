@@ -78,25 +78,64 @@ export class AppComponent implements OnInit {
 
   public events$: Observable<CalendarEvent<{ event: Event }>[]>;
   private listeUsers: any;
-  private listePlanes: any;
+  public listePlanes: Array<Plane> = [];
   private listeEvents: Array<Event> = [];
   public selectedPlane: Plane = new Plane();
 
-  public ngOnInit() {
 
-    this.eventService.getEvents();
-    this.events$ = this.eventService.items$
+  @ViewChild('modalEvent', { static: true }) modalEvent: TemplateRef<any>;
+  @ViewChild('modalAdmin', { static: true }) modalAdmin: TemplateRef<any>;
+
+  view: CalendarView = CalendarView.Month;
+
+  locale: string = 'fr';
+
+  weekStartsOn: number = DAYS_OF_WEEK.MONDAY;
+  weekendDays: number[] = [DAYS_OF_WEEK.SATURDAY, DAYS_OF_WEEK.SUNDAY];
+  CalendarView = CalendarView;
+  viewDate: Date = new Date();
+  activeDayIsOpen: boolean = true;
+  private m_blnAddEvent: boolean = false;
+  modalData: {
+    action: string;
+    event: CalendarEvent;
+  };
+
+  actions: CalendarEventAction[] = [
+    {
+      label: '<img src="../assets/edit.png"></img>',
+      a11yLabel: 'Edit',
+      onClick: ({ event }: { event: CalendarEvent }): void => {
+        this.editEvent(event);
+      },
+    },
+    {
+      label: '<img src="../assets/delete.png"></img>',
+      a11yLabel: 'Delete',
+      onClick: ({ event }: { event: CalendarEvent }): void => {
+        ////////this.events = this.events.filter((iEvent) => iEvent !== event);
+        this.deleteEvent(event);
+      },
+    },
+  ];
+
+  refresh: Subject<any> = new Subject();
+
+
+  public ngOnInit() {
+    //this.eventService.getEvents();
+    this.events$ = this.eventService.getAll().snapshotChanges()
       .pipe(
         map(events => {
           return events.map(eventP => {
             const data = eventP.payload.val();
             const key = eventP.key;
-            var event = { key, ...data };
+            var event: Event = { key, ...data };
             this.listeEvents.push(event);
             var startDate = UtilsHelper.TimestampToDate(event.startDateTime);
             var endDate = UtilsHelper.TimestampToDate(event.endDateTime);
             return {
-              event : event,
+              event: event,
               id: event.key,
               title: event.nom + ' de ' + startDate.getHours() + ':' + String(startDate.getMinutes()).padStart(2, "0") + ' à ' + endDate.getHours() + ':' + String(endDate.getMinutes()).padStart(2, "0"),
               start: new Date(event.startDateTime.seconds * 1000),
@@ -106,7 +145,7 @@ export class AppComponent implements OnInit {
             };
           });
         })
-    );
+      );
 
     this.usersService.getAll().snapshotChanges().pipe(
       map(changes =>
@@ -133,47 +172,6 @@ export class AppComponent implements OnInit {
   }
 
 
-  @ViewChild('modalEvent', { static: true }) modalEvent: TemplateRef<any>;
-  @ViewChild('modalAdmin', { static: true }) modalAdmin: TemplateRef<any>;
-
-  view: CalendarView = CalendarView.Month;
-
-  locale: string = 'fr';
-
-  weekStartsOn: number = DAYS_OF_WEEK.MONDAY;
-
-  weekendDays: number[] = [DAYS_OF_WEEK.SATURDAY, DAYS_OF_WEEK.SUNDAY];
-
-  CalendarView = CalendarView;
-
-  viewDate: Date = new Date();
-
-  private m_blnAddEvent: boolean = false;
-
-  modalData: {
-    action: string;
-    event: CalendarEvent;
-  };
-
-  actions: CalendarEventAction[] = [
-    {
-      label: '<img src="../assets/edit.png"></img>',
-      a11yLabel: 'Edit',
-      onClick: ({ event }: { event: CalendarEvent }): void => {
-        this.editEvent(event);
-      },
-    },
-    {
-      label: '<img src="../assets/delete.png"></img>',
-      a11yLabel: 'Delete',
-      onClick: ({ event }: { event: CalendarEvent }): void => {
-////////this.events = this.events.filter((iEvent) => iEvent !== event);
-        this.deleteEvent(event);
-      },
-    },
-  ];
-
-  refresh: Subject<any> = new Subject();
 
   //events : CalendarEvent[]=
   //  [
@@ -216,8 +214,6 @@ export class AppComponent implements OnInit {
   //    draggable: true,
   //  },
   //];
-
-  activeDayIsOpen: boolean = true;
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (this.m_blnAddEvent) {
@@ -280,7 +276,7 @@ export class AppComponent implements OnInit {
     this.m_blnAddEvent = true;
   }
 
-  public openEvent(date?: Date, isWithHours?:boolean) {
+  public openEvent(date?: Date, isWithHours?: boolean) {
     var isShowDate: Boolean = false;
     if (!date) {
       date = new Date();
@@ -296,6 +292,7 @@ export class AppComponent implements OnInit {
 
     var l_intUser = Math.floor(Math.random() * this.listeUsers.length);
     l_objEvent.nom = this.listeUsers[l_intUser].nom;
+    l_objEvent.keyUser = this.listeUsers[l_intUser].key;
 
     const modalRef = this.modal.open(EventsComponent, { size: 'sm' });
     modalRef.componentInstance.eventData = { event: l_objEvent, addEvent: true, showDate: isShowDate, withHours: isWithHours };
