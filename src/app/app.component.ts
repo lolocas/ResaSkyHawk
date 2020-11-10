@@ -36,8 +36,8 @@ import { CustomDateFormatter } from './custom-date-formatter.provider';
 import { Event, Users, Plane } from './model';
 import { EventsComponent } from './events/events.component';
 import { EventService } from './events/events.service';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { UsersService } from './users/users.service';
 import { PlaneService } from './planes/planes.service';
 import { UtilsHelper } from './UtilsHelper';
@@ -120,20 +120,59 @@ export class AppComponent implements OnInit {
   ];
 
   refresh: Subject<any> = new Subject();
-
+  planeFilter$: BehaviorSubject<string | null>;
+  //colorFilter$: BehaviorSubject<string | null>;
 
   public ngOnInit() {
-    //this.eventService.getEvents();
-    this.events$ = this.eventService.getAll().snapshotChanges()
-      .pipe(
+    this.planeFilter$ = new BehaviorSubject(null);
+   // this.colorFilter$ = new BehaviorSubject(null);
+
+    this.usersService.getAll().snapshotChanges().pipe(
+      map(changes =>
+        changes.map(c =>
+          ({ key: c.key, ...c.payload.val() })
+        )
+      )
+    ).subscribe(data => {
+      this.listeUsers = data;
+    });
+
+    this.planeService.getAll().snapshotChanges().pipe(
+      map(changes =>
+        changes.map(c =>
+          ({ key: c.key, ...c.payload.val() })
+        )
+      )
+    ).subscribe(data => {
+      this.listePlanes = data;
+      if (this.listePlanes && this.listePlanes.length > 0)
+        this.selectedPlane = this.listePlanes[0];
+    });
+
+    this.events$ = combineLatest(
+      this.planeFilter$,
+      //this.colorFilter$
+    ).pipe(switchMap(([keyPlane/*, color*/]) =>
+      this.eventService.dbEvent.collection<Event>('/event', ref => {
+        let query: firebase.firestore.Query = ref;
+        query = query.orderBy('startDateTime');
+        if (keyPlane)
+          query = query.where('keyPlane', '==', keyPlane);
+        //else
+        //  query = query.where('keyPlane', '==', '-MKd60QJE6kfCTfqUWLV');
+        //if (color)
+        //  query = query.where('color', '==', color);
+        return query;
+      }).snapshotChanges().pipe(
         map(events => {
           return events.map(eventP => {
-            const data = eventP.payload.val();
-            const key = eventP.key;
+            const data = eventP.payload.doc.data();
+            const key = eventP.payload.doc.id;
             var event: Event = { key, ...data };
             this.listeEvents.push(event);
             var startDate = UtilsHelper.TimestampToDate(event.startDateTime);
             var endDate = UtilsHelper.TimestampToDate(event.endDateTime);
+
             return {
               event: event,
               id: event.key,
@@ -144,31 +183,33 @@ export class AppComponent implements OnInit {
               actions: this.actions,
             };
           });
-        })
-      );
+        }))
+    ));
 
-    this.usersService.getAll().snapshotChanges().pipe(
-      map(changes =>
-        changes.map(c =>
-          ({ key: c.payload.key, ...c.payload.val() })
-        )
-      )
-    ).subscribe(data => {
-      this.listeUsers = data;
-    });
 
-    this.planeService.getAll().snapshotChanges().pipe(
-      map(changes =>
-        changes.map(c =>
-          ({ key: c.payload.key, ...c.payload.val() })
-        )
-      )
-    ).subscribe(data => {
-      this.listePlanes = data;
-      if (this.listePlanes && this.listePlanes.length > 0)
-        this.selectedPlane = this.listePlanes[0];
-    });
+    //this.events$ = this.eventService.getAll().snapshotChanges()
+    //  .pipe(
+    //    map(events => {
+    //      return events.map(eventP => {
+    //        const data = eventP.payload.doc.data();
+    //        const key = eventP.payload.doc.id;
+    //        var event: Event = { key, ...data };
+    //        this.listeEvents.push(event);
+    //        var startDate = UtilsHelper.TimestampToDate(event.startDateTime);
+    //        var endDate = UtilsHelper.TimestampToDate(event.endDateTime);
 
+    //        return {
+    //          event: event,
+    //          id: event.key,
+    //          title: event.nom + ' de ' + startDate.getHours() + ':' + String(startDate.getMinutes()).padStart(2, "0") + ' à ' + endDate.getHours() + ':' + String(endDate.getMinutes()).padStart(2, "0"),
+    //          start: new Date(event.startDateTime.seconds * 1000),
+    //          end: new Date(event.endDateTime.seconds * 1000),
+    //          color: colors.blue,
+    //          actions: this.actions,
+    //        };
+    //      });
+    //    })
+    //  );
   }
 
 
@@ -327,6 +368,7 @@ export class AppComponent implements OnInit {
 
   public selectPlane(plane: Plane) {
     this.selectedPlane = plane;
+    this.planeFilter$.next(plane.key); 
   }
 
 }

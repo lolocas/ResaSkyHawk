@@ -12,6 +12,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UsersComponent } from './users/users.component';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 import { PlanesComponent } from './planes/planes.component';
 import { EventsComponent } from './events/events.component';
@@ -40,6 +41,7 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
     FlatpickrModule.forRoot(),
     NgbModule,
     AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule, // for firestore
     AngularFireDatabaseModule,
     NgxMaterialTimepickerModule
   ],

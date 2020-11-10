@@ -1,18 +1,21 @@
 <div style="max-width:1000px;position:relative;margin-left:auto;margin-right:auto;top:10px;background-color:white;border-radius:10px;box-shadow:10px 10px 5px rgba(0,0,0,0.75)">
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-2">
       <button class="btn btn-success" (click)="openAdmin()" style="float:left">Adminstration</button>
-
-      <label for="plane-select" style="position: relative;float:left;left:25%">Avion:</label>
-
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-3">
       <div class="btn-group" style="position: relative;float:left;left:25%">
         <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {{selectedPlane.nom}}
+          Avion : {{selectedPlane.nom}}
         </button>
         <div class="dropdown-menu">
-          <a class="dropdown-item" *ngFor="let plane of listePlanes" (click)="selectPlane(plane)">{{plane.nom}}</a>
+          <a class="dropdown-item" href="#" *ngFor="let plane of listePlanes" (click)="selectPlane(plane)">{{plane.nom}}</a>
         </div>
       </div>
+    </div>
+    <div class="col-md-3"></div>
+    <div class="col-md-2">
       <button class="btn btn-success" (click)="openEvent()" style="float:right">Réservation</button>
     </div>
   </div>
