@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -45,7 +45,8 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
     AngularFireDatabaseModule,
     NgxMaterialTimepickerModule
   ],
-  providers: [AppComponent],
+  providers: [AppComponent,
+    { provide: LOCALE_ID, useValue: "fr-fr" }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -335,7 +335,7 @@ export class AppComponent implements OnInit {
     l_objEvent.nom = this.listeUsers[l_intUser].nom;
     l_objEvent.keyUser = this.listeUsers[l_intUser].key;
 
-    const modalRef = this.modal.open(EventsComponent, { size: 'sm' });
+    const modalRef = this.modal.open(EventsComponent);
     modalRef.componentInstance.eventData = { event: l_objEvent, addEvent: true, showDate: isShowDate, withHours: isWithHours };
     modalRef.result.then((result) => {
       if (result) {
@@ -352,7 +352,7 @@ export class AppComponent implements OnInit {
     l_objEvent.endDate = UtilsHelper.TimestampToDate(l_objEvent.endDateTime);
     l_objEvent.keyPlane = this.selectedPlane;
 
-    const modalRef = this.modal.open(EventsComponent, { size: 'sm' });
+    const modalRef = this.modal.open(EventsComponent);
     modalRef.componentInstance.eventData = { event: l_objEvent, addEvent: false };
     modalRef.result.then((result) => {
       if (result) {

@@ -1,6 +1,6 @@
 <div>
   <div class="modal-header">
-    <h6 class="modal-title">Réservation du {{dateDay | date: 'dd/MM/yyyy'}}</h6>
+    <h6 class="modal-title">Réservation du {{dateDay | date: 'fullDate'}}</h6>
     <button type="button" class="close" (click)="modal.close('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -8,8 +8,8 @@
 
   <div class="modal-body">
     <div class="row" *ngIf="!eventData.addEvent || eventData.showDate">
-      <label class="col-md-3" for="date">Date</label>
-      <input class="form-control col-md-8"
+      <label class="col-md-2" for="date">Date</label>
+      <input class="form-control col-md-6"
              type="text"
              mwlFlatpickr
              [(ngModel)]="dateDay"
@@ -19,20 +19,20 @@
              [noCalendar]="false"
              [enableTime]="false"
              dateFormat="d-m-YT"
-             altFormat="j F Y"
+             altFormat="l j F Y"
              [time24hr]="true"
              [locale]="'French'"
              placeholder="Not set" />
     </div>
     <div class="row">
-      <label class="col-md-3" for="debut">Début</label>
-      <ngx-timepicker-field class="form-control col-md-7" [format]="24" [(ngModel)]="startTime"
+      <label class="col-md-2" for="debut">Début</label>
+      <ngx-timepicker-field class="form-control col-md-5" [format]="24" [(ngModel)]="startTime" 
                             [defaultTime]="'12:00'" (timeChanged)="timeStartChange($event)"></ngx-timepicker-field>
 
     </div>
     <div class="row">
-      <label class="col-md-3" for="fin">Fin</label>
-      <ngx-timepicker-field class="form-control col-md-7" [format]="24" [(ngModel)]="endTime"
+      <label class="col-md-2" for="fin">Fin</label>
+      <ngx-timepicker-field class="form-control col-md-5" [format]="24" [(ngModel)]="endTime"
                             [defaultTime]="'13:00'" (timeChanged)="timeEndChange($event)"></ngx-timepicker-field>
     </div>
   </div>

@@ -33,17 +33,53 @@ export class EventsComponent implements OnInit {
 
   public timeStartChange(event: string) {
     console.log(event);
-    if (event && Date.parse('01/01/2020 ' + event) >= Date.parse('01/01/2020 ' + this.endTime)) {
+    var l_lstHours = event.split(':');
+    if (l_lstHours[1] != "00" && l_lstHours[1] != "15" && l_lstHours[1] != "30" && l_lstHours[1] != "45") {
+      var l_intMinutes = Number(l_lstHours[1]);
+      if (l_intMinutes == 1 || l_intMinutes == 29)
+        this.startTime = Number(l_lstHours[0]) + ':' + '15';
+      else if (l_intMinutes == 16 || l_intMinutes == 44)
+        this.startTime = Number(l_lstHours[0]) + ':' + '30';
+      else if (l_intMinutes == 14)
+        this.startTime = Number(l_lstHours[0]) + ':' + '00';
+      else if (l_intMinutes == 31)
+        this.startTime = Number(l_lstHours[0]) + ':' + '45';
+      else if (l_intMinutes == 46)
+        this.startTime = Number(l_lstHours[0]) +1 + ':' + '00';
+      else if (l_intMinutes == 59)
+        this.startTime = Number(l_lstHours[0]) -1 + ':' + '45';
+
+      event = this.startTime;
       var l_lstHours = event.split(':');
-      this.endTime = Number(l_lstHours[0]) + 1 + ':' + '00';
     }
+
+    if (event && Date.parse('01/01/2020 ' + event) >= Date.parse('01/01/2020 ' + this.endTime))
+      this.endTime = Number(l_lstHours[0]) + 1 + ':' + '00';
   }
 
-  public timeEndChange(event:string) {
-    if (event && Date.parse('01/01/2020 ' + event) <= Date.parse('01/01/2020 ' + this.startTime)) {
+  public timeEndChange(event: string) {
+    var l_lstHours = event.split(':');
+    if (l_lstHours[1] != "00" && l_lstHours[1] != "15" && l_lstHours[1] != "30" && l_lstHours[1] != "45") {
+      var l_intMinutes = Number(l_lstHours[1]);
+      if (l_intMinutes == 1 || l_intMinutes == 29)
+        this.endTime = Number(l_lstHours[0]) + ':' + '15';
+      else if (l_intMinutes == 16 || l_intMinutes == 44)
+        this.endTime = Number(l_lstHours[0]) + ':' + '30';
+      else if (l_intMinutes == 14)
+        this.endTime = Number(l_lstHours[0]) + ':' + '00';
+      else if (l_intMinutes == 31)
+        this.endTime = Number(l_lstHours[0]) + ':' + '45';
+      else if (l_intMinutes == 46)
+        this.endTime = Number(l_lstHours[0]) + 1 + ':' + '00';
+      else if (l_intMinutes == 59)
+        this.endTime = Number(l_lstHours[0]) - 1 + ':' + '45';
+
+      event = this.endTime;
       var l_lstHours = event.split(':');
-      this.startTime = Number(l_lstHours[0]) - 1 + ':' + '00';
     }
+
+    if (event && Date.parse('01/01/2020 ' + event) <= Date.parse('01/01/2020 ' + this.startTime))
+      this.startTime = Number(l_lstHours[0]) - 1 + ':' + '00';
   }
 
   public valider(): void {
