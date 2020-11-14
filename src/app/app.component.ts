@@ -41,6 +41,7 @@ import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { UsersService } from './users/users.service';
 import { PlaneService } from './planes/planes.service';
 import { UtilsHelper } from './UtilsHelper';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 
 registerLocaleData(localeFr);
 
@@ -74,14 +75,20 @@ const colors: any = {
 
 export class AppComponent implements OnInit {
 
-  constructor(private modal: NgbModal, private eventService: EventService, private usersService: UsersService, private planeService: PlaneService) { }
+  constructor(private modal: NgbModal, private eventService: EventService, private usersService: UsersService, private planeService: PlaneService,
+    private activatedRoute: ActivatedRoute, private router: Router) { }
 
   public events$: Observable<CalendarEvent<{ event: Event }>[]>;
   private listeUsers: any;
   public listePlanes: Array<Plane> = [];
   private listeEvents: Array<Event> = [];
-  public selectedPlane: Plane = new Plane();
-
+  public selectedPlane: Plane = null;
+  public isConnected: boolean = false;
+  public currentUser: Users;
+  public submitted: boolean = false;
+  public identifiant: string = "";
+  public password: string = "";
+  public planeKey: string = "";
 
   @ViewChild('modalEvent', { static: true }) modalEvent: TemplateRef<any>;
   @ViewChild('modalAdmin', { static: true }) modalAdmin: TemplateRef<any>;
@@ -370,5 +377,31 @@ export class AppComponent implements OnInit {
     this.selectedPlane = plane;
     this.planeFilter$.next(plane.key); 
   }
+
+  public login() {
+    this.submitted = true;
+    if (!this.identifiant || !this.password || !this.planeKey)
+      return;
+
+    var l_intUser = Math.floor(Math.random() * this.listeUsers.length);
+    this.currentUser = this.listeUsers[l_intUser];
+
+    this.isConnected = true;
+  }
+
+  public logout() {
+    this.navigate();
+  }
+
+  private navigate() {
+    this.router.navigate(
+      [],
+      {
+        relativeTo: this.activatedRoute,
+      }).then(function () {
+        window.location.reload();
+      })
+  }
+
 
 }

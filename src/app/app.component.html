@@ -1,11 +1,45 @@
-<div style="max-width:1000px;position:relative;margin-left:auto;margin-right:auto;top:10px;background-color:white;border-radius:10px;box-shadow:10px 10px 5px rgba(0,0,0,0.75)">
-  <div class="row">
-    <div class="col-md-2">
-      <button class="btn btn-success" (click)="openAdmin()" style="float:left">Adminstration</button>
+<div class="container">
+  <div class="overlay" *ngIf="!isConnected">
+    <form class="login" (ngSubmit)="login()">
+      <div style="padding:15px">
+        <input type="text" [(ngModel)]="identifiant" name="txtIdentifiant" class="form-control" placeholder="Identifiant" [class.is-invalid]="submitted && !identifiant">
+        <div *ngIf="submitted" class="invalid-feedback">Renseigner l'identifiant</div>
+      </div>
+      <div style="padding:15px">
+        <input type="text" [(ngModel)]="password" name="txtPassword" class="form-control" placeholder="Mot de passe" [class.is-invalid]="submitted && !password">
+        <div *ngIf="submitted" class="invalid-feedback">Renseigner le mot de passe</div>
+      </div>
+      <div style="padding:15px">
+        <select class="custom-select" [(ngModel)]="planeKey" name="planeKey" [class.is-invalid]="submitted && !planeKey">
+          <option value="">Choisissez un avion</option>
+          <option *ngFor="let plane of listePlanes" [value]="plane.key">{{plane.nom}}</option>
+        </select>
+        <div class="invalid-feedback">Renseigner un avion</div>
+      </div>
+      <div style="position:absolute;bottom:5px;left:150px;">
+        <button class="btn btn-info">Connexion</button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="isConnected" style="position: fixed; right: 10px; top: 0px;display:flex">
+    <div style="float:left">
+      <h2>
+        Bienvenue {{currentUser.prenom}} {{currentUser.nom}}
+      </h2>
     </div>
-    <div class="col-md-2"></div>
-    <div class="col-md-3">
-      <div class="btn-group" style="position: relative;float:left;left:25%">
+    <div>
+      <img src="../assets/logout.png" (click)="logout()" style="cursor:pointer" title="Déconnexion" />
+    </div>
+  </div>
+
+  <div style="max-width:1000px;position:relative;margin-left:auto;margin-right:auto;top:10px;background-color:white;border-radius:10px;box-shadow:10px 10px 5px rgba(0,0,0,0.75)" *ngIf="isConnected">
+    <div class="row">
+      <div class="col-md-2">
+        <button class="btn btn-success" (click)="openAdmin()" style="float:left">Adminstration</button>
+      </div>
+      <div class="col-md-2"></div>
+      <div class="col-md-4 btn-group">
         <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Avion : {{selectedPlane.nom}}
         </button>
@@ -13,150 +47,149 @@
           <a class="dropdown-item" href="#" *ngFor="let plane of listePlanes" (click)="selectPlane(plane)">{{plane.nom}}</a>
         </div>
       </div>
-    </div>
-    <div class="col-md-3"></div>
-    <div class="col-md-2">
-      <button class="btn btn-success" (click)="openEvent()" style="float:right">Réservation</button>
-    </div>
-  </div>
-  <div class="row text-center">
-    <div class="col-md-4 btn-group" style="top:10px;left:10px">
-      <div class="btn btn-primary"
-           mwlCalendarPreviousView
-           [view]="view"
-           [(viewDate)]="viewDate"
-           (viewDateChange)="closeOpenMonthViewDay()">
-        Précédent
-      </div>
-      <div class="btn btn-outline-secondary"
-           mwlCalendarToday
-           [(viewDate)]="viewDate">
-        Aujourd'hui
-      </div>
-      <div class="btn btn-primary"
-           mwlCalendarNextView
-           [view]="view"
-           [(viewDate)]="viewDate"
-           (viewDateChange)="closeOpenMonthViewDay()">
-        Suivant
+      <div class="col-md-2"></div>
+      <div class="col-md-2">
+        <button class="btn btn-success" (click)="openEvent()" style="float:right">Réservation</button>
       </div>
     </div>
-    <div class="col-md-4">
-      <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'fr' }}</h3>
+    <div class="row text-center">
+      <div class="col-md-4 btn-group" style="top:10px;left:10px">
+        <div class="btn btn-primary"
+             mwlCalendarPreviousView
+             [view]="view"
+             [(viewDate)]="viewDate"
+             (viewDateChange)="closeOpenMonthViewDay()">
+          Précédent
+        </div>
+        <div class="btn btn-outline-secondary"
+             mwlCalendarToday
+             [(viewDate)]="viewDate">
+          Aujourd'hui
+        </div>
+        <div class="btn btn-primary"
+             mwlCalendarNextView
+             [view]="view"
+             [(viewDate)]="viewDate"
+             (viewDateChange)="closeOpenMonthViewDay()">
+          Suivant
+        </div>
+      </div>
+      <div class="col-md-4">
+        <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'fr' }}</h3>
+      </div>
+      <div class="col-md-4 btn-group" style="top:10px;left:-10px">
+        <div class="btn btn-primary"
+             (click)="setView(CalendarView.Month)"
+             [class.active]="view === CalendarView.Month">
+          Mois
+        </div>
+        <div class="btn btn-primary"
+             (click)="setView(CalendarView.Week)"
+             [class.active]="view === CalendarView.Week">
+          Semaine
+        </div>
+        <div class="btn btn-primary"
+             (click)="setView(CalendarView.Day)"
+             [class.active]="view === CalendarView.Day">
+          Jour
+        </div>
+      </div>
     </div>
-    <div class="col-md-4 btn-group" style="top:10px;left:-10px">
-      <div class="btn btn-primary"
-           (click)="setView(CalendarView.Month)"
-           [class.active]="view === CalendarView.Month">
-        Mois
-      </div>
-      <div class="btn btn-primary"
-           (click)="setView(CalendarView.Week)"
-           [class.active]="view === CalendarView.Week">
-        Semaine
-      </div>
-      <div class="btn btn-primary"
-           (click)="setView(CalendarView.Day)"
-           [class.active]="view === CalendarView.Day">
-        Jour
-      </div>
-    </div>
-  </div>
-  <br />
-  <div *ngIf="events$ | async;let events" [ngSwitch]="view">
-    <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month"
+    <br />
+    <div *ngIf="events$ | async;let events" [ngSwitch]="view">
+      <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month"
+                               [viewDate]="viewDate"
+                               [events]="events"
+                               [refresh]="refresh"
+                               [activeDayIsOpen]="activeDayIsOpen"
+                               [locale]="locale"
+                               [weekStartsOn]="weekStartsOn"
+                               [weekendDays]="weekendDays"
+                               (dayClicked)="dayClicked($event.day)"
+                               (eventClicked)="handleEvent('Clicked', $event.event)"
+                               (eventTimesChanged)="eventTimesChanged($event)"
+                               [cellTemplate]="monthCellTemplate">
+      </mwl-calendar-month-view>
+      <mwl-calendar-week-view *ngSwitchCase="CalendarView.Week"
+                              [viewDate]="viewDate"
+                              [events]="events"
+                              [refresh]="refresh"
+                              [locale]="locale"
+                              [dayStartHour]="5"
+                              [dayEndHour]="22"
+                              [hourSegments]="1"
+                              [weekStartsOn]="weekStartsOn"
+                              [weekendDays]="weekendDays"
+                              (eventClicked)="handleEvent('Clicked', $event.event)"
+                              (eventTimesChanged)="eventTimesChanged($event)"
+                              [headerTemplate]="weekHeaderTemplate"
+                              [hourSegmentTemplate]="weekViewHourSegment">
+      </mwl-calendar-week-view>
+      <mwl-calendar-day-view *ngSwitchCase="CalendarView.Day"
                              [viewDate]="viewDate"
                              [events]="events"
                              [refresh]="refresh"
-                             [activeDayIsOpen]="activeDayIsOpen"
                              [locale]="locale"
-                             [weekStartsOn]="weekStartsOn"
-                             [weekendDays]="weekendDays"
-                             (dayClicked)="dayClicked($event.day)"
+                             [dayStartHour]="5"
+                             [dayEndHour]="22"
+                             [hourSegments]="1"
                              (eventClicked)="handleEvent('Clicked', $event.event)"
                              (eventTimesChanged)="eventTimesChanged($event)"
-                             [cellTemplate]="monthCellTemplate">
-    </mwl-calendar-month-view>
-    <mwl-calendar-week-view *ngSwitchCase="CalendarView.Week"
-                            [viewDate]="viewDate"
-                            [events]="events"
-                            [refresh]="refresh"
-                            [locale]="locale"
-                            [dayStartHour]="5"
-                            [dayEndHour]="22"
-                            [hourSegments]="1"
-                            [weekStartsOn]="weekStartsOn"
-                            [weekendDays]="weekendDays"
-                            (eventClicked)="handleEvent('Clicked', $event.event)"
-                            (eventTimesChanged)="eventTimesChanged($event)"
-                            [headerTemplate]="weekHeaderTemplate"
-                            [hourSegmentTemplate]="weekViewHourSegment">
-    </mwl-calendar-week-view>
-    <mwl-calendar-day-view *ngSwitchCase="CalendarView.Day"
-                           [viewDate]="viewDate"
-                           [events]="events"
-                           [refresh]="refresh"
-                           [locale]="locale"
-                           [dayStartHour]="5"
-                           [dayEndHour]="22"
-                           [hourSegments]="1"
-                           (eventClicked)="handleEvent('Clicked', $event.event)"
-                           (eventTimesChanged)="eventTimesChanged($event)"
-                           [hourSegmentTemplate]="dayHourSegmentTemplate">
-    </mwl-calendar-day-view>
-  </div>
-</div>
-
-<context-menu #dayMenu>
-  <ng-template contextMenuItem (execute)="openEvent($event.item)">
-    Réservation
-  </ng-template>
-</context-menu>
-
-<context-menu #hourMenu>
-  <ng-template contextMenuItem (execute)="openEvent($event.item, true)">
-    Réservation
-  </ng-template>
-</context-menu>
-
-<!-- Modal d'évènement -->
-<ng-template #modalEvent let-close="close">
-  <app-events></app-events>
-</ng-template>
-
-<!-- Module Administration -->
-<ng-template #modalAdmin let-close="close">
-  <div class="modal-header">
-    <h5 class="modal-title">Administration</h5>
-    <button type="button" class="close" (click)="close()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div>
-    <ul class="nav nav-pills" id="myTab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <a class="nav-link active" id="users-tab" data-toggle="pill" href="#users" role="tab" aria-controls="users" aria-selected="true">Utilisateurs</a>
-      </li>
-      <li class="nav-item" role="presentation">
-        <a class="nav-link" id="planes-tab" data-toggle="pill" href="#planes" role="tab" aria-controls="planes" aria-selected="false">Avions</a>
-      </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade active show" id="users" role="tabpanel" aria-labelledby="users-tab">
-        <app-users></app-users>
-      </div>
-      <div class="tab-pane fade" id="planes" role="tabpanel" aria-labelledby="planes-tab">
-        <app-planes></app-planes>
-      </div>
+                             [hourSegmentTemplate]="dayHourSegmentTemplate">
+      </mwl-calendar-day-view>
     </div>
   </div>
-</ng-template>
 
-<!-- Custom cell calendar -->
-<ng-template #monthCellTemplate let-day="day" let-locale="locale">
+  <context-menu #dayMenu>
+    <ng-template contextMenuItem (execute)="openEvent($event.item)">
+      Réservation
+    </ng-template>
+  </context-menu>
+
+  <context-menu #hourMenu>
+    <ng-template contextMenuItem (execute)="openEvent($event.item, true)">
+      Réservation
+    </ng-template>
+  </context-menu>
+
+  <!-- Modal d'évènement -->
+  <ng-template #modalEvent let-close="close">
+    <app-events></app-events>
+  </ng-template>
+
+  <!-- Module Administration -->
+  <ng-template #modalAdmin let-close="close">
+    <div class="modal-header">
+      <h5 class="modal-title">Administration</h5>
+      <button type="button" class="close" (click)="close()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div>
+      <ul class="nav nav-pills" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <a class="nav-link active" id="users-tab" data-toggle="pill" href="#users" role="tab" aria-controls="users" aria-selected="true">Utilisateurs</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="planes-tab" data-toggle="pill" href="#planes" role="tab" aria-controls="planes" aria-selected="false">Avions</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade active show" id="users" role="tabpanel" aria-labelledby="users-tab">
+          <app-users></app-users>
+        </div>
+        <div class="tab-pane fade" id="planes" role="tabpanel" aria-labelledby="planes-tab">
+          <app-planes></app-planes>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Custom cell calendar -->
+  <ng-template #monthCellTemplate let-day="day" let-locale="locale">
     <div class="cal-cell-top"
          [contextMenu]="dayMenu"
-       [contextMenuSubject]="day.date">
+         [contextMenuSubject]="day.date">
       <button type="button" (click)="addEvent()" class="btn bouton-image addButton" style="float:right" title="Ajouter une reservation le {{day.date | date: 'dd/MM/yyyy'}}"></button>
       <span style="margin-top:0;margin-left:0;vertical-align:top" class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
       <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
@@ -169,55 +202,56 @@
 
 
     <!--  <small style="margin: 5px;">There are {{ day.events.length }} events on this day</small>-->
-</ng-template>
+  </ng-template>
 
-<!-- Template semaine en-tête -->
-<ng-template #weekHeaderTemplate let-days="days" let-locale="locale">
-  <div class="cal-day-headers">
-    <div class="cal-header"
-         *ngFor="let day of days"
-         [class.cal-past]="day.isPast"
-         [class.cal-today]="day.isToday"
-         [class.cal-future]="day.isFuture"
-         [class.cal-weekend]="day.isWeekend">
-      <b>{{ day.date | calendarDate:'weekViewColumnHeader':locale }}</b><br />
-      <span>{{ day.date | calendarDate:'weekViewColumnSubHeader':locale }}</span>
-      <button type="button" (click)="openEvent(day.date)" class="btn bouton-image addButton" style="float:right" title="Ajouter une reservation le {{day.date | date: 'dd/MM/yyyy'}}"></button>
+  <!-- Template semaine en-tête -->
+  <ng-template #weekHeaderTemplate let-days="days" let-locale="locale">
+    <div class="cal-day-headers">
+      <div class="cal-header"
+           *ngFor="let day of days"
+           [class.cal-past]="day.isPast"
+           [class.cal-today]="day.isToday"
+           [class.cal-future]="day.isFuture"
+           [class.cal-weekend]="day.isWeekend">
+        <b>{{ day.date | calendarDate:'weekViewColumnHeader':locale }}</b><br />
+        <span>{{ day.date | calendarDate:'weekViewColumnSubHeader':locale }}</span>
+        <button type="button" (click)="openEvent(day.date)" class="btn bouton-image addButton" style="float:right" title="Ajouter une reservation le {{day.date | date: 'dd/MM/yyyy'}}"></button>
+      </div>
     </div>
-  </div>
-</ng-template>
+  </ng-template>
 
-<ng-template #weekViewHourSegment
-             let-segment="segment"
-             let-locale="locale"
-             let-segmentHeight="segmentHeight"
-             let-isTimeLabel="isTimeLabel">
-  <div class="cal-hour-segment"
-       [style.height.px]="segmentHeight"
-       [class.cal-hour-start]="segment.isStart"
-       [class.cal-after-hour-start]="!segment.isStart"
-       [ngClass]="segment.cssClass"
-       [contextMenu]="hourMenu"
-       [contextMenuSubject]="segment.date">
-    <div class="cal-time" *ngIf="isTimeLabel">
-      {{ segment.date | calendarDate: 'weekViewHour':locale }}
+  <ng-template #weekViewHourSegment
+               let-segment="segment"
+               let-locale="locale"
+               let-segmentHeight="segmentHeight"
+               let-isTimeLabel="isTimeLabel">
+    <div class="cal-hour-segment"
+         [style.height.px]="segmentHeight"
+         [class.cal-hour-start]="segment.isStart"
+         [class.cal-after-hour-start]="!segment.isStart"
+         [ngClass]="segment.cssClass"
+         [contextMenu]="hourMenu"
+         [contextMenuSubject]="segment.date">
+      <div class="cal-time" *ngIf="isTimeLabel">
+        {{ segment.date | calendarDate: 'weekViewHour':locale }}
+      </div>
     </div>
-  </div>
-</ng-template>
+  </ng-template>
 
-<ng-template #dayHourSegmentTemplate
-             let-segment="segment"
-             let-locale="locale"
-             let-segmentHeight="segmentHeight">
-  <div class="cal-hour-segment"
-       [style.height.px]="segmentHeight"
-       [class.cal-hour-start]="segment.isStart"
-       [class.cal-after-hour-start]="!segment.isStart"
-       [ngClass]="segment.cssClass"
-       [contextMenu]="hourMenu"
-       [contextMenuSubject]="segment.date">
-    <div class="cal-time">
-      {{ segment.date | calendarDate: 'dayViewHour':locale }}
+  <ng-template #dayHourSegmentTemplate
+               let-segment="segment"
+               let-locale="locale"
+               let-segmentHeight="segmentHeight">
+    <div class="cal-hour-segment"
+         [style.height.px]="segmentHeight"
+         [class.cal-hour-start]="segment.isStart"
+         [class.cal-after-hour-start]="!segment.isStart"
+         [ngClass]="segment.cssClass"
+         [contextMenu]="hourMenu"
+         [contextMenuSubject]="segment.date">
+      <div class="cal-time">
+        {{ segment.date | calendarDate: 'dayViewHour':locale }}
+      </div>
     </div>
-  </div>
-</ng-template>
+  </ng-template>
+</div>
