@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Users } from '../model';
 
 @Injectable({
@@ -9,29 +9,25 @@ export class UsersService {
 
   private dbPath = '/users';
 
-  usersRef: AngularFireList<Users> = null;
+  usersRef: AngularFirestoreCollection<Users> = null;
 
-  constructor(private db: AngularFireDatabase) {
-    this.usersRef = db.list(this.dbPath);
+  constructor(private db: AngularFirestore) {
+    this.usersRef = db.collection(this.dbPath);
   }
 
-  getAll(): AngularFireList<Users> {
+  getAll(): AngularFirestoreCollection<Users> {
     return this.usersRef;
   }
 
   create(user: Users): any {
-    return this.usersRef.push(user);
+    return this.usersRef.add({ ...user });
   }
 
   update(key: string, value: any): Promise<void> {
-    return this.usersRef.update(key, value);
+    return this.usersRef.doc(key).update(value);
   }
 
   delete(key: string): Promise<void> {
-    return this.usersRef.remove(key);
-  }
-
-  deleteAll(): Promise<void> {
-    return this.usersRef.remove();
+    return this.usersRef.doc(key).delete();
   }
 }

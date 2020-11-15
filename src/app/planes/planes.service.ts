@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Plane } from '../model';
 
 @Injectable({
@@ -9,29 +9,25 @@ export class PlaneService {
 
   private dbPath = '/plane';
 
-  PlaneRef: AngularFireList<Plane> = null;
+  PlaneRef: AngularFirestoreCollection<Plane> = null;
 
-  constructor(private db: AngularFireDatabase) {
-    this.PlaneRef = db.list(this.dbPath);
+  constructor(private db: AngularFirestore) {
+    this.PlaneRef = db.collection(this.dbPath);
   }
 
-  getAll(): AngularFireList<Plane> {
+  getAll(): AngularFirestoreCollection<Plane> {
     return this.PlaneRef;
   }
 
   create(plane: Plane): any {
-    return this.PlaneRef.push(plane);
+    return this.PlaneRef.add({ ...plane });
   }
 
   update(key: string, value: any): Promise<void> {
-    return this.PlaneRef.update(key, value);
+    return this.PlaneRef.doc(key).update(value);
   }
 
   delete(key: string): Promise<void> {
-    return this.PlaneRef.remove(key);
-  }
-
-  deleteAll(): Promise<void> {
-    return this.PlaneRef.remove();
+    return this.PlaneRef.doc(key).delete();
   }
 }

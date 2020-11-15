@@ -2,7 +2,7 @@
   <div class="overlay" *ngIf="!isConnected">
     <form class="login" (ngSubmit)="login()">
       <div style="padding:15px">
-        <input type="text" [(ngModel)]="identifiant" name="txtIdentifiant" class="form-control" placeholder="Identifiant" [class.is-invalid]="submitted && !identifiant">
+        <input type="text" [(ngModel)]="identifiant" id="txtIdentifiant" class="form-control" placeholder="Identifiant" [class.is-invalid]="submitted && !identifiant">
         <div *ngIf="submitted" class="invalid-feedback">Renseigner l'identifiant</div>
       </div>
       <div style="padding:15px">

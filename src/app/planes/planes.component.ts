@@ -68,7 +68,7 @@ export class PlanesComponent implements OnInit {
     this.planeService.getAll().snapshotChanges().pipe(
       map(changes =>
         changes.map(c =>
-          ({ key: c.key, ...c.payload.val() })
+          ({ key: c.payload.doc.id, ...c.payload.doc.data() })
         )
       )
     ).subscribe(data => {

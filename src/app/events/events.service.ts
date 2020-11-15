@@ -17,14 +17,6 @@ export class EventService {
 
   constructor(private db: AngularFirestore) {
     this.EventRef = db.collection<Event>(this.dbPath);
-
-    //this.EventRef = db.collection<Event>(this.dbPath, ref => {
-    //  let query: firebase.firestore.Query = ref;
-    //  if (size) { query = query.where('size', '==', size) };
-    //  if (color) { query = query.where('color', '==', color) };
-    //  return query;
-    //});
-
     this.dbEvent = db;
   }
 
@@ -43,8 +35,4 @@ export class EventService {
   delete(key: string): Promise<void> {
     return this.EventRef.doc(key).delete();
   }
-
-  //deleteAll(): Promise<void> {
-  //  return this.EventRef.remove();
-  //}
 }

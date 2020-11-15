@@ -17,6 +17,7 @@ export class EventsComponent implements OnInit {
   @Input() @Output() public startTime: string = '12:00';
   @Input() @Output() public endTime: string = '13:00';
   @Input() @Output() public dateDay: Date;
+  @Input() @Output() public description: string;
 
   constructor(private eventService: EventService, public modal: NgbActiveModal) { }
 
@@ -29,6 +30,7 @@ export class EventsComponent implements OnInit {
       this.startTime = this.eventData.event.startDate.getHours() + ':' + this.eventData.event.startDate.getMinutes();
       this.endTime = this.eventData.event.endDate.getHours() + ':' + this.eventData.event.endDate.getMinutes();
     }
+    this.description = this.eventData.event.description;
   }
 
   public timeStartChange(event: string) {
@@ -97,6 +99,11 @@ export class EventsComponent implements OnInit {
     this.eventData.event.endDate.setHours(Number(l_lstEndHours[0]), Number(l_lstEndHours[1]));
     this.eventData.event.startDateTime = UtilsHelper.DateToTimestamp(this.eventData.event.startDate);
     this.eventData.event.endDateTime = UtilsHelper.DateToTimestamp(this.eventData.event.endDate);
+
+    if (this.description)
+      this.eventData.event.description = this.description;
+    else
+      this.eventData.event.description = '';
 
     if (this.eventData.addEvent) {
       this.eventService.create(this.eventData.event).then(() => {

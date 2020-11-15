@@ -71,7 +71,7 @@ export class UsersComponent implements OnInit {
     this.usersService.getAll().snapshotChanges().pipe(
       map(changes =>
         changes.map(c =>
-          ({ key: c.payload.key, ...c.payload.val() })
+          ({ key: c.payload.doc.id, ...c.payload.doc.data() })
         )
       )
     ).subscribe(data => {

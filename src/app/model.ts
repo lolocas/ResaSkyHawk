@@ -20,7 +20,7 @@ export class Event {
   //}
 
   public key: string;
-  public nom: string;
+  public description: string;
   public startDate: Date;
   public endDate: Date;
   public startDateTime: Timestamp;

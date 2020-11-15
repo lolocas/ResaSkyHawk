@@ -79,12 +79,12 @@ export class AppComponent implements OnInit {
     private activatedRoute: ActivatedRoute, private router: Router) { }
 
   public events$: Observable<CalendarEvent<{ event: Event }>[]>;
-  private listeUsers: any;
+  private listeUsers: Array<Users> = [];
   public listePlanes: Array<Plane> = [];
   private listeEvents: Array<Event> = [];
-  public selectedPlane: Plane = null;
+  public selectedPlane: Plane = new Plane();
   public isConnected: boolean = false;
-  public currentUser: Users;
+  public currentUser: Users = new Users();
   public submitted: boolean = false;
   public identifiant: string = "";
   public password: string = "";
@@ -137,7 +137,7 @@ export class AppComponent implements OnInit {
     this.usersService.getAll().snapshotChanges().pipe(
       map(changes =>
         changes.map(c =>
-          ({ key: c.key, ...c.payload.val() })
+          ({ key: c.payload.doc.id, ...c.payload.doc.data() })
         )
       )
     ).subscribe(data => {
@@ -147,13 +147,13 @@ export class AppComponent implements OnInit {
     this.planeService.getAll().snapshotChanges().pipe(
       map(changes =>
         changes.map(c =>
-          ({ key: c.key, ...c.payload.val() })
+          ({ key: c.payload.doc.id, ...c.payload.doc.data() })
         )
       )
     ).subscribe(data => {
       this.listePlanes = data;
-      if (this.listePlanes && this.listePlanes.length > 0)
-        this.selectedPlane = this.listePlanes[0];
+      if (this.listePlanes && this.listePlanes.length == 1)
+        this.planeKey = this.listePlanes[0].key;
     });
 
     this.events$ = combineLatest(
@@ -180,10 +180,19 @@ export class AppComponent implements OnInit {
             var startDate = UtilsHelper.TimestampToDate(event.startDateTime);
             var endDate = UtilsHelper.TimestampToDate(event.endDateTime);
 
+            var title:string = startDate.getHours() + ':' + String(startDate.getMinutes()).padStart(2, "0") + ' à ' + endDate.getHours() + ':' + String(endDate.getMinutes()).padStart(2, "0");
+            if (this.listeUsers) {
+              var user: Users = this.listeUsers.find(item => item.key == event.keyUser);
+              if (user)
+                title += " " + user.prenom + " " + user.nom;
+            }
+            if (event.description)
+              title += " - " + event.description;
+
             return {
               event: event,
               id: event.key,
-              title: event.nom + ' de ' + startDate.getHours() + ':' + String(startDate.getMinutes()).padStart(2, "0") + ' à ' + endDate.getHours() + ':' + String(endDate.getMinutes()).padStart(2, "0"),
+              title: title,
               start: new Date(event.startDateTime.seconds * 1000),
               end: new Date(event.endDateTime.seconds * 1000),
               color: colors.blue,
@@ -338,9 +347,7 @@ export class AppComponent implements OnInit {
     if (isWithHours)
       l_objEvent.endDate = addHours(l_objEvent.endDate, 1);
 
-    var l_intUser = Math.floor(Math.random() * this.listeUsers.length);
-    l_objEvent.nom = this.listeUsers[l_intUser].nom;
-    l_objEvent.keyUser = this.listeUsers[l_intUser].key;
+    l_objEvent.keyUser = this.currentUser.key;
 
     const modalRef = this.modal.open(EventsComponent);
     modalRef.componentInstance.eventData = { event: l_objEvent, addEvent: true, showDate: isShowDate, withHours: isWithHours };
@@ -380,11 +387,26 @@ export class AppComponent implements OnInit {
 
   public login() {
     this.submitted = true;
-    if (!this.identifiant || !this.password || !this.planeKey)
+    if (!this.identifiant || !this.password || (this.listePlanes.length && !this.planeKey))
       return;
 
-    var l_intUser = Math.floor(Math.random() * this.listeUsers.length);
-    this.currentUser = this.listeUsers[l_intUser];
+    if (this.listeUsers.length > 0) {
+      var l_intUser = Math.floor(Math.random() * this.listeUsers.length);
+      this.currentUser = this.listeUsers[l_intUser];
+    }
+    else {
+      this.currentUser.nom = "";
+      this.currentUser.prenom = "";
+    }
+
+    if (this.listePlanes && this.listePlanes.length > 0) {
+      var plane = this.listePlanes.find(item => item.key == this.planeKey);
+      if (plane)
+        this.selectedPlane = plane;
+    }
+    else {
+      this.selectedPlane.nom = '';
+    }
 
     this.isConnected = true;
   }

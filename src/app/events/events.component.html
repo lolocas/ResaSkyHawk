@@ -8,7 +8,7 @@
 
   <div class="modal-body">
     <div class="row" *ngIf="!eventData.addEvent || eventData.showDate">
-      <label class="col-md-2" for="date">Date</label>
+      <label class="col-md-3" for="date">Date</label>
       <input class="form-control col-md-6"
              type="text"
              mwlFlatpickr
@@ -25,15 +25,20 @@
              placeholder="Not set" />
     </div>
     <div class="row">
-      <label class="col-md-2" for="debut">Début</label>
-      <ngx-timepicker-field class="form-control col-md-5" [format]="24" [(ngModel)]="startTime" 
+      <label class="col-md-3" for="debut">Début</label>
+      <ngx-timepicker-field class="form-control col-md-5" [format]="24" [(ngModel)]="startTime"
                             [defaultTime]="'12:00'" (timeChanged)="timeStartChange($event)"></ngx-timepicker-field>
 
     </div>
     <div class="row">
-      <label class="col-md-2" for="fin">Fin</label>
+      <label class="col-md-3" for="fin">Fin</label>
       <ngx-timepicker-field class="form-control col-md-5" [format]="24" [(ngModel)]="endTime"
                             [defaultTime]="'13:00'" (timeChanged)="timeEndChange($event)"></ngx-timepicker-field>
+    </div>
+    <div class="row">
+      <label class="col-md-3" for="Description">Description</label>
+      <input type="text" class="form-control col-md-8" id="description" required
+             [(ngModel)]="description" name="description" />
     </div>
   </div>
     <div class="modal-footer">
