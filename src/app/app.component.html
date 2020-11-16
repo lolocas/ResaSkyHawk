@@ -2,11 +2,11 @@
   <div class="overlay" *ngIf="!isConnected">
     <form class="login" (ngSubmit)="login()">
       <div style="padding:15px">
-        <input type="text" [(ngModel)]="identifiant" id="txtIdentifiant" class="form-control" placeholder="Identifiant" [class.is-invalid]="submitted && !identifiant">
+        <input type="text" [(ngModel)]="identifiant" id="txtIdentifiant" name="txtIdentifiant" class="form-control" placeholder="Identifiant" [class.is-invalid]="submitted && !identifiant">
         <div *ngIf="submitted" class="invalid-feedback">Renseigner l'identifiant</div>
       </div>
       <div style="padding:15px">
-        <input type="text" [(ngModel)]="password" name="txtPassword" class="form-control" placeholder="Mot de passe" [class.is-invalid]="submitted && !password">
+        <input type="password" [(ngModel)]="password" name="txtPassword" class="form-control" placeholder="Mot de passe" [class.is-invalid]="submitted && !password">
         <div *ngIf="submitted" class="invalid-feedback">Renseigner le mot de passe</div>
       </div>
       <div style="padding:15px">
@@ -36,7 +36,7 @@
   <div style="max-width:1000px;position:relative;margin-left:auto;margin-right:auto;top:10px;background-color:white;border-radius:10px;box-shadow:10px 10px 5px rgba(0,0,0,0.75)" *ngIf="isConnected">
     <div class="row">
       <div class="col-md-2">
-        <button class="btn btn-success" (click)="openAdmin()" style="float:left">Adminstration</button>
+        <button class="btn btn-success" (click)="openAdmin()" style="float:left" *ngIf="isAdmin">Adminstration</button>
       </div>
       <div class="col-md-2"></div>
       <div class="col-md-4 btn-group">
@@ -49,7 +49,7 @@
       </div>
       <div class="col-md-2"></div>
       <div class="col-md-2">
-        <button class="btn btn-success" (click)="openEvent()" style="float:right">Réservation</button>
+        <button class="btn btn-success" (click)="openEvent()" style="float:right" *ngIf="!isAdmin">Réservation</button>
       </div>
     </div>
     <div class="row text-center">
@@ -140,7 +140,7 @@
     </div>
   </div>
 
-  <context-menu #dayMenu>
+  <context-menu #dayMenu *ngIf="!isAdmin">
     <ng-template contextMenuItem (execute)="openEvent($event.item)">
       Réservation
     </ng-template>
@@ -190,14 +190,14 @@
     <div class="cal-cell-top"
          [contextMenu]="dayMenu"
          [contextMenuSubject]="day.date">
-      <button type="button" (click)="addEvent()" class="btn bouton-image addButton" style="float:right" title="Ajouter une reservation le {{day.date | date: 'dd/MM/yyyy'}}"></button>
+      <button type="button" (click)="addEvent()" class="btn bouton-image addButton" style="float:right" title="Ajouter une reservation le {{day.date | date: 'dd/MM/yyyy'}}" *ngIf="!isAdmin"></button>
       <span style="margin-top:0;margin-left:0;vertical-align:top" class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
       <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
     </div>
 
     <div class="cal-events ng-star-inserted">
       <div mwldraggable="" dragactiveclass="cal-drag-active" class="cal-event ng-star-inserted" aria-hidden="true"
-           [ngStyle]="{'background-color':event.color}" *ngFor="let event of day.events"></div>
+           [ngStyle]="{'background-color':event.color?.primary}" *ngFor="let event of day.events"></div>
     </div>
 
 

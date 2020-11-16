@@ -11,7 +11,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of listeUsers">
+        <tr *ngFor="let user of listeUsers" [ngStyle]="{'background-color':user.couleur}">
           <td>{{user.prenom}}</td>
           <td><span>{{user.nom}}</span></td>
           <td>
@@ -23,24 +23,43 @@
     </table>
   </div>
   <div *ngIf="editMode||createMode" class="col-md-6">
-    <div class="form-group">
-      <label for="prenom">Prénom</label>
-      <input class="form-control"
-             id="prenom"
-             required
-             [(ngModel)]="currentUser.prenom"
-             name="prenom" />
+    <div class="form-group row">
+      <label class="col-md-3" for="prenom">Prénom</label>
+      <div class="col-md-8">
+        <input type="text" class="form-control" id="prenom" [class.is-invalid]="submitted && !currentUser.prenom"
+               [(ngModel)]="currentUser.prenom" name="prenom" />
+        <div *ngIf="submitted" class="invalid-feedback">Le prénom est obligatoire</div>
+      </div>
     </div>
-    <div class="form-group">
-      <label for="nom">Nom</label>
-      <input type="text"
-             class="form-control"
-             id="nom"
-             required
-             [(ngModel)]="currentUser.nom"
-             name="nom" />
+    <div class="form-group row">
+      <label class="col-md-3" for="nom">Nom</label>
+      <div class="col-md-8">
+        <input type="text" class="form-control" id="nom" [class.is-invalid]="submitted && !currentUser.nom"
+               [(ngModel)]="currentUser.nom" name="nom" />
+        <div *ngIf="submitted" class="invalid-feedback">Le nom est obligatoire</div>
+      </div>
     </div>
-
+    <div class="form-group row">
+      <label class="col-md-3" for="nom">Identifiant</label>
+      <div class="col-md-8">
+        <input type="text" class="form-control" id="identifiant" [class.is-invalid]="submitted && !currentUser.identifiant"
+               [(ngModel)]="currentUser.identifiant" name="nom" />
+        <div *ngIf="submitted" class="invalid-feedback">L'identifiant est obligatoire</div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-md-3" for="nom">Mot de passe</label>
+      <div class="col-md-8">
+        <input type="password" class="form-control" [class.is-invalid]="submitted && !currentUser.password"
+               id="password" [(ngModel)]="currentUser.password"
+               name="nom" />
+        <div *ngIf="submitted" class="invalid-feedback">Le mot de passe est obligatoire</div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-md-3" for="nom">Couleur</label>
+      <input type="color" [(ngModel)]="currentUser.couleur"/>
+    </div>
     <button (click)="cancelEdit()" class="btn btn-warning">Annuler</button>
     <button (click)="saveUser()" class="btn btn-success" style="float:right">Valider</button>
   </div>

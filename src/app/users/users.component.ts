@@ -15,7 +15,8 @@ export class UsersComponent implements OnInit {
   public editMode: boolean = false;
   public createMode: boolean = false;
   public currentUser: Users = null;
-  public cloneUser: Users = null;
+  public submitted: boolean = false;
+  private cloneUser: Users = null;
 
   @ViewChild('confirmeDelete', { static: true }) confirmeDelete: TemplateRef<any>;
 
@@ -25,20 +26,44 @@ export class UsersComponent implements OnInit {
     this.retrieveUsers();
   }
 
-  public saveUser(): void {
-    if (this.createMode) {
-      this.usersService.create(this.currentUser).then(() => {
-        console.log('Created new user successfully!', this.currentUser);
-        this.createMode = false;
+  public async saveUser() {
+    this.submitted = true;
+    if (!this.currentUser.prenom || !this.currentUser.nom || !this.currentUser.identifiant || !this.currentUser.password)
+      return;
+
+    var identExists = await this.usersService.getAll().ref
+      .where("identifiant", "==", this.currentUser.identifiant)
+      .where("key", "!=", (this.currentUser.key ? this.currentUser.key : ""))
+      .get()
+      .then(function (querySnapshot) {
+        var l_blnExists: boolean = false;
+        querySnapshot.forEach(function (doc) {
+          alert("L'identifiant existe déjà");
+          l_blnExists = true;
+          return;
+        });
+        return l_blnExists;
+      })
+      .catch(function (error) {
+        console.log("Error getting documents: ", error);
       });
+
+    if (!identExists) {
+      if (this.createMode) {
+        this.usersService.create(this.currentUser).then(() => {
+          console.log('Created new user successfully!', this.currentUser);
+          this.createMode = false;
+        });
+      }
+      else if (this.editMode) {
+        this.usersService.update(this.currentUser.key, this.currentUser).then(() => {
+          console.log('Edit user successfully!', this.currentUser);
+          this.editMode = false;
+          this.currentUser = null;
+        });
+      }
     }
-    else if (this.editMode) {
-      this.usersService.update(this.currentUser.key, this.currentUser).then(() => {
-        console.log('Edit user successfully!', this.currentUser);
-        this.editMode = false;
-        this.currentUser = null;
-      });
-    }
+    this.submitted = false;
   }
 
   public addUser(): void {

@@ -6,6 +6,9 @@ export class Users {
   public key: string;
   public nom: string;
   public prenom: string;
+  public identifiant: string;
+  public password: string;
+  public couleur: string;
 }
 
 export class Plane {

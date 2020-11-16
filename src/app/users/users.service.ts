@@ -10,9 +10,11 @@ export class UsersService {
   private dbPath = '/users';
 
   usersRef: AngularFirestoreCollection<Users> = null;
+  public dbUser: AngularFirestore;
 
   constructor(private db: AngularFirestore) {
     this.usersRef = db.collection(this.dbPath);
+    this.dbUser = db;
   }
 
   getAll(): AngularFirestoreCollection<Users> {
@@ -29,5 +31,9 @@ export class UsersService {
 
   delete(key: string): Promise<void> {
     return this.usersRef.doc(key).delete();
+  }
+
+  queryUser(column: string, value: string, test: any = '==') : any {
+    return this.usersRef.ref.where(column, test, value);
   }
 }

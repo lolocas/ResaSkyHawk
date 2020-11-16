@@ -4,7 +4,7 @@ import {
   ViewChild,
   TemplateRef,
   OnInit,
-  APP_BOOTSTRAP_LISTENER,
+  AfterViewInit
 } from '@angular/core';
 import {
   startOfDay,
@@ -73,12 +73,13 @@ const colors: any = {
   ]
 })
 
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
 
   constructor(private modal: NgbModal, private eventService: EventService, private usersService: UsersService, private planeService: PlaneService,
     private activatedRoute: ActivatedRoute, private router: Router) { }
 
   public events$: Observable<CalendarEvent<{ event: Event }>[]>;
+  public planes$: Observable<Array<Plane>>;
   private listeUsers: Array<Users> = [];
   public listePlanes: Array<Plane> = [];
   private listeEvents: Array<Event> = [];
@@ -89,6 +90,7 @@ export class AppComponent implements OnInit {
   public identifiant: string = "";
   public password: string = "";
   public planeKey: string = "";
+  public isAdmin: boolean = false;
 
   @ViewChild('modalEvent', { static: true }) modalEvent: TemplateRef<any>;
   @ViewChild('modalAdmin', { static: true }) modalAdmin: TemplateRef<any>;
@@ -165,8 +167,6 @@ export class AppComponent implements OnInit {
         query = query.orderBy('startDateTime');
         if (keyPlane)
           query = query.where('keyPlane', '==', keyPlane);
-        //else
-        //  query = query.where('keyPlane', '==', '-MKd60QJE6kfCTfqUWLV');
         //if (color)
         //  query = query.where('color', '==', color);
         return query;
@@ -181,8 +181,9 @@ export class AppComponent implements OnInit {
             var endDate = UtilsHelper.TimestampToDate(event.endDateTime);
 
             var title:string = startDate.getHours() + ':' + String(startDate.getMinutes()).padStart(2, "0") + ' à ' + endDate.getHours() + ':' + String(endDate.getMinutes()).padStart(2, "0");
+            var user: Users = null;
             if (this.listeUsers) {
-              var user: Users = this.listeUsers.find(item => item.key == event.keyUser);
+               user = this.listeUsers.find(item => item.key == event.keyUser);
               if (user)
                 title += " " + user.prenom + " " + user.nom;
             }
@@ -195,82 +196,17 @@ export class AppComponent implements OnInit {
               title: title,
               start: new Date(event.startDateTime.seconds * 1000),
               end: new Date(event.endDateTime.seconds * 1000),
-              color: colors.blue,
-              actions: this.actions,
+              color: (user && user.couleur) ? { primary: user.couleur, secondary : user.couleur } : null,
+              actions: (user && user.key == this.currentUser.key) ? this.actions : null,
             };
           });
         }))
     ));
-
-
-    //this.events$ = this.eventService.getAll().snapshotChanges()
-    //  .pipe(
-    //    map(events => {
-    //      return events.map(eventP => {
-    //        const data = eventP.payload.doc.data();
-    //        const key = eventP.payload.doc.id;
-    //        var event: Event = { key, ...data };
-    //        this.listeEvents.push(event);
-    //        var startDate = UtilsHelper.TimestampToDate(event.startDateTime);
-    //        var endDate = UtilsHelper.TimestampToDate(event.endDateTime);
-
-    //        return {
-    //          event: event,
-    //          id: event.key,
-    //          title: event.nom + ' de ' + startDate.getHours() + ':' + String(startDate.getMinutes()).padStart(2, "0") + ' à ' + endDate.getHours() + ':' + String(endDate.getMinutes()).padStart(2, "0"),
-    //          start: new Date(event.startDateTime.seconds * 1000),
-    //          end: new Date(event.endDateTime.seconds * 1000),
-    //          color: colors.blue,
-    //          actions: this.actions,
-    //        };
-    //      });
-    //    })
-    //  );
   }
 
-
-
-  //events : CalendarEvent[]=
-  //  [
-  //  {
-  //    start: subDays(startOfDay(new Date()), 1),
-  //    end: addDays(new Date(), 1),
-  //    title: 'A 3 day event',
-  //    color: colors.red,
-  //    actions: this.actions,
-  //    allDay: true,
-  //    resizable: {
-  //      beforeStart: true,
-  //      afterEnd: true,
-  //    },
-  //    draggable: true,
-  //  },
-  //  {
-  //    start: startOfDay(new Date()),
-  //    title: 'An event with no end date',
-  //    color: colors.yellow,
-  //    actions: this.actions,
-  //  },
-  //  {
-  //    start: subDays(endOfMonth(new Date()), 3),
-  //    end: addDays(endOfMonth(new Date()), 3),
-  //    title: 'A long event that spans 2 months',
-  //    color: colors.blue,
-  //    allDay: true,
-  //  },
-  //  {
-  //    start: addHours(startOfDay(new Date()), 2),
-  //    end: addHours(new Date(), 2),
-  //    title: 'A draggable and resizable event',
-  //    color: colors.yellow,
-  //    actions: this.actions,
-  //    resizable: {
-  //      beforeStart: true,
-  //      afterEnd: true,
-  //    },
-  //    draggable: true,
-  //  },
-  //];
+  public ngAfterViewInit() {
+    document.getElementById("txtIdentifiant").focus();
+  }
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (this.m_blnAddEvent) {
@@ -295,16 +231,6 @@ export class AppComponent implements OnInit {
     newStart,
     newEnd,
   }: CalendarEventTimesChangedEvent): void {
-    /*this.events = this.events.map((iEvent) => {
-      if (iEvent === event) {
-        return {
-          ...event,
-          start: newStart,
-          end: newEnd,
-        };
-      }
-      return iEvent;
-    });*/
     this.handleEvent('Dropped or resized', event);
   }
 
@@ -391,8 +317,14 @@ export class AppComponent implements OnInit {
       return;
 
     if (this.listeUsers.length > 0) {
-      var l_intUser = Math.floor(Math.random() * this.listeUsers.length);
-      this.currentUser = this.listeUsers[l_intUser];
+      var user = this.listeUsers.find(item => item.identifiant.toLowerCase() == this.identifiant.toLowerCase() && item.password == this.password);
+      if (!user) {
+        alert("Identifiant ou mot de passe incorrect");
+        return;
+      }
+      this.currentUser = user;
+      if (this.currentUser.identifiant == "Administration")
+        this.isAdmin = true;
     }
     else {
       this.currentUser.nom = "";
