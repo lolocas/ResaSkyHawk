@@ -335,7 +335,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         return;
       }
       this.currentUser = user;
-      if (this.currentUser.identifiant == "Administration")
+      if (this.currentUser.identifiant.toLowerCase() == "administration")
         this.isAdmin = true;
     }
     else {
