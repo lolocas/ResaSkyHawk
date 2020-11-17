@@ -37,6 +37,8 @@
     <div class="row">
       <div class="col-md-2">
         <button class="btn btn-success" (click)="openAdmin()" style="float:left" *ngIf="isAdmin">Adminstration</button>
+        <button class="btn btn-warning btn-sm" (click)="openMesResa()" style="float:left" *ngIf="!isAdmin && !isMesResa">Mes réservations</button>
+        <button class="btn btn-warning btn-sm" (click)="openMesResa()" style="float:left" *ngIf="!isAdmin && isMesResa">Toutes réservations</button>
       </div>
       <div class="col-md-2"></div>
       <div class="col-md-4 btn-group">

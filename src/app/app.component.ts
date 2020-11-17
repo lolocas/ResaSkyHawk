@@ -42,6 +42,7 @@ import { UsersService } from './users/users.service';
 import { PlaneService } from './planes/planes.service';
 import { UtilsHelper } from './UtilsHelper';
 import { Router, ActivatedRoute, Params } from '@angular/router';
+import { AngularFireAuth } from "@angular/fire/auth";
 
 registerLocaleData(localeFr);
 
@@ -76,7 +77,7 @@ const colors: any = {
 export class AppComponent implements OnInit, AfterViewInit {
 
   constructor(private modal: NgbModal, private eventService: EventService, private usersService: UsersService, private planeService: PlaneService,
-    private activatedRoute: ActivatedRoute, private router: Router) { }
+    private activatedRoute: ActivatedRoute, private router: Router, private afAuth: AngularFireAuth) { }
 
   public events$: Observable<CalendarEvent<{ event: Event }>[]>;
   public planes$: Observable<Array<Plane>>;
@@ -91,6 +92,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   public password: string = "";
   public planeKey: string = "";
   public isAdmin: boolean = false;
+  public isMesResa: boolean = false;
 
   @ViewChild('modalEvent', { static: true }) modalEvent: TemplateRef<any>;
   @ViewChild('modalAdmin', { static: true }) modalAdmin: TemplateRef<any>;
@@ -130,11 +132,13 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   refresh: Subject<any> = new Subject();
   planeFilter$: BehaviorSubject<string | null>;
-  //colorFilter$: BehaviorSubject<string | null>;
+  userFilter$: BehaviorSubject<string | null>;
 
   public ngOnInit() {
+    this.afAuth.signInAnonymously();
+
     this.planeFilter$ = new BehaviorSubject(null);
-   // this.colorFilter$ = new BehaviorSubject(null);
+    this.userFilter$ = new BehaviorSubject(null);
 
     this.usersService.getAll().snapshotChanges().pipe(
       map(changes =>
@@ -160,15 +164,15 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     this.events$ = combineLatest(
       this.planeFilter$,
-      //this.colorFilter$
-    ).pipe(switchMap(([keyPlane/*, color*/]) =>
+      this.userFilter$
+    ).pipe(switchMap(([keyPlane, keyUser]) =>
       this.eventService.dbEvent.collection<Event>('/event', ref => {
         let query: firebase.firestore.Query = ref;
         query = query.orderBy('startDateTime');
         if (keyPlane)
           query = query.where('keyPlane', '==', keyPlane);
-        //if (color)
-        //  query = query.where('color', '==', color);
+        if (keyUser)
+          query = query.where('keyUser', '==', keyUser);
         return query;
       }).snapshotChanges().pipe(
         map(events => {
@@ -255,6 +259,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.modal.open(this.modalAdmin, { size: 'xl' });
   }
 
+  public openMesResa() {
+    this.isMesResa = !this.isMesResa;
+    if (this.isMesResa)
+      this.userFilter$.next(this.currentUser.key);
+    else
+      this.userFilter$.next("");
+  }
+
   public addEvent() {
     this.m_blnAddEvent = true;
   }
@@ -327,8 +339,8 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.isAdmin = true;
     }
     else {
-      this.currentUser.nom = "";
-      this.currentUser.prenom = "";
+      alert("Aucun utilisateur");
+      return;
     }
 
     if (this.listePlanes && this.listePlanes.length > 0) {
@@ -344,6 +356,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   public logout() {
+    this.afAuth.signOut();
     this.navigate();
   }
 
