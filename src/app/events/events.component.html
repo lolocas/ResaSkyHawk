@@ -38,7 +38,9 @@
     <div class="row">
       <label class="col-md-3" for="Description">Description</label>
       <input type="text" class="form-control col-md-8" id="description"
+              [class.is-invalid]="submitted && !description"
              [(ngModel)]="description" name="description" />
+      <div class="invalid-feedback">Renseigner une description</div>
     </div>
     <div class="row" *ngIf="listeUsers.length > 0">
       <label class="col-md-3" for="Utilisateurs">Utilisateurs</label>

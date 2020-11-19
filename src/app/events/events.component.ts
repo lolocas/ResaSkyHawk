@@ -93,7 +93,7 @@ export class EventsComponent implements OnInit {
 
   public valider(): void {
     this.submitted = true;
-    if (this.listeUsers && !this.userKey)
+    if ((this.listeUsers.length > 0 && !this.userKey) || !this.description)
       return;
 
     this.saveEvent();
@@ -115,7 +115,7 @@ export class EventsComponent implements OnInit {
     else
       this.eventData.event.description = '';
 
-    if (this.listeUsers)
+    if (this.listeUsers.length > 0)
       this.eventData.event.keyUser = this.userKey;
 
     if (this.eventData.addEvent) {
