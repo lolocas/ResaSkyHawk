@@ -37,8 +37,15 @@
     </div>
     <div class="row">
       <label class="col-md-3" for="Description">Description</label>
-      <input type="text" class="form-control col-md-8" id="description" required
+      <input type="text" class="form-control col-md-8" id="description"
              [(ngModel)]="description" name="description" />
+    </div>
+    <div class="row" *ngIf="listeUsers.length > 0">
+      <label class="col-md-3" for="Utilisateurs">Utilisateurs</label>
+      <select class="custom-select col-md-8" [(ngModel)]="userKey" name="userKey" [class.is-invalid]="submitted && !userKey">
+        <option *ngFor="let user of listeUsers" [value]="user.key">{{user.prenom}} {{user.nom}}</option>
+      </select>
+      <div class="invalid-feedback">Renseigner un utilisateur</div>
     </div>
   </div>
     <div class="modal-footer">

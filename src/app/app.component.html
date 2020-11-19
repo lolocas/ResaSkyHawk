@@ -51,7 +51,7 @@
       </div>
       <div class="col-md-2"></div>
       <div class="col-md-2">
-        <button class="btn btn-success" (click)="openEvent()" style="float:right" *ngIf="!isAdmin">Réservation</button>
+        <button class="btn btn-success" (click)="openEvent()" style="float:right">Réservation</button>
       </div>
     </div>
     <div class="row text-center">
@@ -142,7 +142,7 @@
     </div>
   </div>
 
-  <context-menu #dayMenu *ngIf="!isAdmin">
+  <context-menu #dayMenu>
     <ng-template contextMenuItem (execute)="openEvent($event.item)">
       Réservation
     </ng-template>
@@ -192,7 +192,9 @@
     <div class="cal-cell-top"
          [contextMenu]="dayMenu"
          [contextMenuSubject]="day.date">
-      <button type="button" (click)="addEvent()" class="btn bouton-image addButton" style="float:right" title="Ajouter une reservation le {{day.date | date: 'dd/MM/yyyy'}}" *ngIf="!isAdmin"></button>
+      <button type="button" (click)="addEvent()" class="btn bouton-image addButton" style="float:right"
+              *ngIf="todayDate <= day.date"
+              title="Ajouter une reservation le {{day.date | date: 'dd/MM/yyyy'}}"></button>
       <span style="margin-top:0;margin-left:0;vertical-align:top" class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
       <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
     </div>
@@ -217,7 +219,9 @@
            [class.cal-weekend]="day.isWeekend">
         <b>{{ day.date | calendarDate:'weekViewColumnHeader':locale }}</b><br />
         <span>{{ day.date | calendarDate:'weekViewColumnSubHeader':locale }}</span>
-        <button type="button" (click)="openEvent(day.date)" class="btn bouton-image addButton" style="float:right" title="Ajouter une reservation le {{day.date | date: 'dd/MM/yyyy'}}"></button>
+        <button type="button" (click)="openEvent(day.date)" class="btn bouton-image addButton" style="float:right"
+                *ngIf="todayDate <= day.date"
+                title="Ajouter une reservation le {{day.date | date: 'dd/MM/yyyy'}}"></button>
       </div>
     </div>
   </ng-template>

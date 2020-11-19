@@ -1,35 +1,8 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  ViewChild,
-  TemplateRef,
-  OnInit,
-  AfterViewInit
-} from '@angular/core';
-import {
-  startOfDay,
-  endOfDay,
-  subDays,
-  addDays,
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  isSameDay,
-  isSameMonth,
-  addHours,
-  format
-} from 'date-fns';
+import { Component, ChangeDetectionStrategy, ViewChild, TemplateRef, OnInit, AfterViewInit } from '@angular/core';
+import { isSameDay, isSameMonth, addHours } from 'date-fns';
 import { Subject } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {
-  CalendarEvent,
-  CalendarEventAction,
-  CalendarEventTimesChangedEvent,
-  CalendarDateFormatter,
-  CalendarView,
-  DAYS_OF_WEEK
-} from 'angular-calendar';
+import { CalendarEvent, CalendarEventAction, CalendarEventTimesChangedEvent, CalendarDateFormatter, CalendarView, DAYS_OF_WEEK } from 'angular-calendar';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr'; // to register french
 import { CustomDateFormatter } from './custom-date-formatter.provider';
@@ -45,21 +18,6 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AngularFireAuth } from "@angular/fire/auth";
 
 registerLocaleData(localeFr);
-
-const colors: any = {
-  red: {
-    primary: '#ad2121',
-    secondary: '#FAE3E3',
-  },
-  blue: {
-    primary: '#1e90ff',
-    secondary: '#D1E8FF',
-  },
-  yellow: {
-    primary: '#e3bc08',
-    secondary: '#FDF1BA',
-  },
-};
 
 @Component({
   selector: 'app-root',
@@ -93,6 +51,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   public planeKey: string = "";
   public isAdmin: boolean = false;
   public isMesResa: boolean = false;
+  public todayDate = new Date();
 
   @ViewChild('modalEvent', { static: true }) modalEvent: TemplateRef<any>;
   @ViewChild('modalAdmin', { static: true }) modalAdmin: TemplateRef<any>;
@@ -124,7 +83,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       label: '<img src="../assets/delete.png"></img>',
       a11yLabel: 'Delete',
       onClick: ({ event }: { event: CalendarEvent }): void => {
-        ////////this.events = this.events.filter((iEvent) => iEvent !== event);
         this.deleteEvent(event);
       },
     },
@@ -136,6 +94,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   public ngOnInit() {
     this.afAuth.signInAnonymously();
+    this.todayDate.setHours(0, 0, 0, 0);
 
     this.planeFilter$ = new BehaviorSubject(null);
     this.userFilter$ = new BehaviorSubject(null);
@@ -201,7 +160,7 @@ export class AppComponent implements OnInit, AfterViewInit {
               start: new Date(event.startDateTime.seconds * 1000),
               end: new Date(event.endDateTime.seconds * 1000),
               color: (user && user.couleur) ? { primary: user.couleur, secondary : user.couleur } : null,
-              actions: (user && user.key == this.currentUser.key) ? this.actions : null,
+              actions: ((user && user.key == this.currentUser.key) || this.isAdmin) ? this.actions : null,
             };
           });
         }))
@@ -243,10 +202,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.modal.open(this.modalEvent, { size: 'lg' });
   }
 
-  //deleteEvent(eventToDelete: CalendarEvent) {
-  ///////////  this.events = this.events.filter((event) => event !== eventToDelete);
-  //}
-
   setView(view: CalendarView) {
     this.view = view;
   }
@@ -285,10 +240,19 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (isWithHours)
       l_objEvent.endDate = addHours(l_objEvent.endDate, 1);
 
-    l_objEvent.keyUser = this.currentUser.key;
-
     const modalRef = this.modal.open(EventsComponent);
-    modalRef.componentInstance.eventData = { event: l_objEvent, addEvent: true, showDate: isShowDate, withHours: isWithHours };
+    modalRef.componentInstance.eventData =
+    {
+      event: l_objEvent,
+      addEvent: true,
+      showDate: isShowDate,
+      withHours: isWithHours
+    };
+    if (this.isAdmin)
+      modalRef.componentInstance.eventData.listeUsers = this.listeUsers;
+    else
+      l_objEvent.keyUser = this.currentUser.key;
+
     modalRef.result.then((result) => {
       if (result) {
         console.log(result);

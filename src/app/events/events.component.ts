@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, TemplateRef, Input, Output } from '@angular/core';
+import { Component, OnInit, Input, Output } from '@angular/core';
 import { EventService } from './events.service';
-import { Event } from '../model';
+import { Event, Users } from '../model';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { UtilsHelper } from '../UtilsHelper';
@@ -12,25 +12,32 @@ import { flatpickrFactory } from '../app.module';
   styleUrls: ['./events.component.css']
 })
 export class EventsComponent implements OnInit {
-  @Input() @Output() public eventData: { event: Event, addEvent: boolean, showDate: boolean, withHours: boolean };
+  @Input() @Output() public eventData: { event: Event, addEvent: boolean, showDate: boolean, withHours: boolean, listeUsers: Array<Users> };
   public refresh: Subject<any> = new Subject();
   @Input() @Output() public startTime: string = '12:00';
   @Input() @Output() public endTime: string = '13:00';
   @Input() @Output() public dateDay: Date;
   @Input() @Output() public description: string;
+  @Output() public listeUsers: Array<Users> = [];
+  @Input() @Output() public submitted: boolean = false;
+  @Input() @Output() public userKey: string;
 
   constructor(private eventService: EventService, public modal: NgbActiveModal) { }
 
   ngOnInit(): void {
     flatpickrFactory();
 
-      this.dateDay = this.eventData.event.startDate;
+    this.dateDay = this.eventData.event.startDate;
 
     if (!this.eventData.addEvent || this.eventData.withHours) {
       this.startTime = this.eventData.event.startDate.getHours() + ':' + this.eventData.event.startDate.getMinutes();
       this.endTime = this.eventData.event.endDate.getHours() + ':' + this.eventData.event.endDate.getMinutes();
     }
     this.description = this.eventData.event.description;
+
+    if (this.eventData.listeUsers) {
+      this.listeUsers = this.eventData.listeUsers.filter(function (item) { return item.identifiant != "administration"; }); 
+    }
   }
 
   public timeStartChange(event: string) {
@@ -85,7 +92,10 @@ export class EventsComponent implements OnInit {
   }
 
   public valider(): void {
-    //this.eventData.event.nom = 'TTI';
+    this.submitted = true;
+    if (this.listeUsers && !this.userKey)
+      return;
+
     this.saveEvent();
     this.modal.close(this.saveEvent);
   }
@@ -104,6 +114,9 @@ export class EventsComponent implements OnInit {
       this.eventData.event.description = this.description;
     else
       this.eventData.event.description = '';
+
+    if (this.listeUsers)
+      this.eventData.event.keyUser = this.userKey;
 
     if (this.eventData.addEvent) {
       this.eventService.create(this.eventData.event).then(() => {
