@@ -50,7 +50,7 @@
     <div class="form-group row">
       <label class="col-md-3" for="nom">Mot de passe</label>
       <div class="col-md-8">
-        <input type="password" class="form-control" [class.is-invalid]="submitted && !currentUser.password"
+        <input type="text" class="form-control" [class.is-invalid]="submitted && !currentUser.password"
                id="password" [(ngModel)]="currentUser.password"
                name="nom" />
         <div *ngIf="submitted" class="invalid-feedback">Le mot de passe est obligatoire</div>
